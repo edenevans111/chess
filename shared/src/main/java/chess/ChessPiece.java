@@ -10,8 +10,13 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
+    private ChessGame.TeamColor pieceColor;
+    private ChessPiece.PieceType type;
+
     // I am pretty sure that this is supposed to be the constructor...
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
 
     /**
