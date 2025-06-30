@@ -56,10 +56,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard squares, ChessPosition startPosition) {
         return (switch (type){
-            // case KING -> new King();
+            case KING -> new King(); 
             case BISHOP -> new Bishop();
-            default -> null;
-            // I should do the rook next - apparently that is the best option
+            case ROOK -> new Rook();
+            case QUEEN -> new Queen();
+            case KNIGHT -> new Knight();
+            case PAWN -> new Pawn();
         }).move(squares, startPosition);
     }
 }
