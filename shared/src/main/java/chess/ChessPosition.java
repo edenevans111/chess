@@ -40,17 +40,19 @@ public class ChessPosition {
 
 
     @Override
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
-        ChessPosition that = (ChessPosition) object;
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPosition that = (ChessPosition) o;
         return row == that.row && col == that.col;
     }
+
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), row, col);
+        return Objects.hash(row, col);
     }
-    // I might want to change what this prints out later...
+
     @Override
     public String toString() {
         return "ChessPosition{" +

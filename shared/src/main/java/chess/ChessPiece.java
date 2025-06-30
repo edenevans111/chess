@@ -59,6 +59,7 @@ public class ChessPiece {
             // case KING -> new King();
             case BISHOP -> new Bishop();
             default -> null;
+            // I should do the rook next - apparently that is the best option
         }).move(squares, startPosition);
     }
 }
