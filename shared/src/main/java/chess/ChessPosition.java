@@ -35,9 +35,6 @@ public class ChessPosition {
     }
 
     public boolean isOnBoard(){
-        int row = getRow();
-        int col = getColumn();
-
         return row <= 8 && row >= 1 && col <= 8 && col >= 1;
     }
 

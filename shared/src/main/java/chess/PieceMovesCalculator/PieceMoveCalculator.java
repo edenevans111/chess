@@ -2,6 +2,10 @@ package chess.PieceMovesCalculator;
 
 import chess.*;
 
-public abstract class PieceMoveCalculator  {
-    protected final ChessBoard squares;
+import java.util.Collection;
+
+public interface PieceMoveCalculator  {
+
+     Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition);
+
 }

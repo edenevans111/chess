@@ -1,12 +1,36 @@
 package chess.PieceMovesCalculator;
 
-import chess.ChessPiece;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessGame;
-import chess.ChessPosition;
-import chess.ChessBoard;
+import chess.*;
 
-public class Bishop extends PieceMoveCalculator{
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+public class Bishop implements PieceMoveCalculator{
+    @Override
+    public Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition) {
+        // this is where to write what the Bishop does
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessGame.TeamColor teamColor = squares.getPiece(startPosition).getTeamColor();
+        int [][] directions = {
+                {1, 1}, {-1, -1}, {1, -1}, {-1, 1}
+        };
+        for (int[] direction : directions) {
+            for (int i = 1; i < 8; i++) {
+                ChessPosition endPosition = new ChessPosition(startPosition.getRow() + i * direction[0], startPosition.getColumn() + i * direction[1]);
+                if (!endPosition.isOnBoard()) {
+                    break;
+                }
+                ChessPiece pieceAtEnd = squares.getPiece(endPosition);
+                if (pieceAtEnd != null) {
+                    if (pieceAtEnd.getTeamColor() != teamColor) {
+                        moves.add(new ChessMove(startPosition, endPosition));
+                    }
+                    break;
+                }
+                moves.add(new ChessMove(startPosition, endPosition));
+            }
+        }
+        return moves;
+    }
 }
