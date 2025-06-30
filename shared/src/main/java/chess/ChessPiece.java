@@ -56,7 +56,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard squares, ChessPosition startPosition) {
         return (switch (type){
-            case KING -> new King(); 
+            case KING -> new King();
             case BISHOP -> new Bishop();
             case ROOK -> new Rook();
             case QUEEN -> new Queen();
