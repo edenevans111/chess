@@ -11,7 +11,6 @@ public class Pawn implements PieceMoveCalculator {
 
     @Override
     public Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition) {
-        // might want to change to HashSet later on...
         Collection<ChessPiece.PieceType> promotionTypes = new ArrayList<>();
         promotionTypes.add(ChessPiece.PieceType.QUEEN);
         promotionTypes.add(ChessPiece.PieceType.BISHOP);
