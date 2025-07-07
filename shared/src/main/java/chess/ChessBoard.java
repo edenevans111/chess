@@ -1,8 +1,6 @@
 package chess;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -81,6 +79,35 @@ public class ChessBoard {
         this.addPiece(new ChessPosition(8, 4), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
         this.addPiece(new ChessPosition(8, 5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
 
+    }
+
+    public ChessPosition kingPosition(ChessGame.TeamColor teamColor){
+        for (int i = 1; i < 8; i++) {
+            for (int j = 1; j < 8; j++) {
+                if(getPiece(new ChessPosition(i, j)) != null){
+                    if(getPiece(new ChessPosition(i , j)).getPieceType() == ChessPiece.PieceType.KING){
+                        if(getPiece(new ChessPosition(i , j)).getTeamColor() == teamColor){
+                            return new ChessPosition(i , j);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public Collection<ChessPosition> teamPositions(ChessGame.TeamColor teamColor){
+        Collection<ChessPosition> positions = new ArrayList<>();
+        for (int i = 1; i < 8; i++) {
+            for (int j = 1; j < 8; j++) {
+                if(getPiece(new ChessPosition(i, j)) != null){
+                    if(getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor){
+                        positions.add(new ChessPosition(i, j));
+                    }
+                }
+            }
+        }
+        return positions;
     }
 
     @Override
