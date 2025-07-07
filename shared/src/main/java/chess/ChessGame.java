@@ -15,6 +15,7 @@ public class ChessGame {
 
     public ChessGame() {
         ChessBoard squares = new ChessBoard();
+        squares.resetBoard();
         this.squares = squares;
         this.teamTurn = TeamColor.WHITE;
     }
@@ -101,7 +102,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.squares = board;
     }
 
     /**
@@ -110,6 +111,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return squares;
     }
 }
