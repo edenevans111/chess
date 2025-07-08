@@ -106,6 +106,25 @@ public class ChessGame {
         if(!isInCheck(teamColor)){
             return false;
         }
+        TeamColor opponentColor;
+        if(teamColor == TeamColor.WHITE){
+            opponentColor = TeamColor.BLACK;
+        } else {
+            opponentColor = TeamColor.WHITE;
+        }
+        Collection<ChessPosition> positions = squares.teamPositions(teamColor);
+        for(ChessPosition position : positions){
+            ChessPiece piece = squares.getPiece(position);
+            Collection<ChessMove> moves = piece.pieceMoves(squares, position);
+            for(ChessMove move : moves){
+                // need to see if completing the move will result in Check
+                // if it doesn't return false
+                // make a duplicateBoard function in
+                ChessBoard potentialBoard = squares.makeDuplicate();
+            }
+        }
+        // get all the possible moves from teamColor,
+        // if none of them make isInCheck false, return true
         return true;
     }
 

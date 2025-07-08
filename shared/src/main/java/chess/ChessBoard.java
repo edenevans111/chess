@@ -110,6 +110,33 @@ public class ChessBoard {
         return positions;
     }
 
+    public ChessBoard makeDuplicate(){
+        ChessBoard copy = new ChessBoard();
+        for (int i = 1; i < 8; i++) {
+            for (int j = 1; j < 8; j++) {
+                if(this.squares != null){
+                    ChessPosition position = new ChessPosition(i,j);
+                    ChessPiece piece = new ChessPiece(getPiece(position).getTeamColor(), getPiece(position).getPieceType());
+                    copy.addPiece(new ChessPosition(i, j), piece);
+                }
+            }
+        }
+        return copy;
+    }
+
+    public void makeMove(ChessMove move){
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        ChessPiece piece = this.getPiece(startPosition);
+        // I am not sure that I am doing this correctly
+        this.addPiece(endPosition, piece);
+        this.removePiece(startPosition);
+    }
+
+    private void removePiece(ChessPosition position){
+        squares[position.getRow()][position.getColumn()] = null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
