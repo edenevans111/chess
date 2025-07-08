@@ -117,14 +117,13 @@ public class ChessGame {
             ChessPiece piece = squares.getPiece(position);
             Collection<ChessMove> moves = piece.pieceMoves(squares, position);
             for(ChessMove move : moves){
-                // need to see if completing the move will result in Check
-                // if it doesn't return false
-                // make a duplicateBoard function in
                 ChessBoard potentialBoard = squares.makeDuplicate();
+                potentialBoard.makeMove(move);
+                if(!isInCheck(teamColor)){
+                    return false;
+                }
             }
         }
-        // get all the possible moves from teamColor,
-        // if none of them make isInCheck false, return true
         return true;
     }
 
