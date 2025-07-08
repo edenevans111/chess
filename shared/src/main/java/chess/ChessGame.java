@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -33,7 +34,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        teamTurn = team;
     }
 
     /**
@@ -52,7 +53,21 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> actuallyValid = new ArrayList<>();
+
+        ChessGame.TeamColor teamColor = squares.getPiece(startPosition).getTeamColor();
+        // need to get all the potential moves of the piece
+        Collection<ChessMove> potentiallyValid = squares.getPiece(startPosition).pieceMoves(squares, startPosition);
+        // for each of the moves, check to see if they would result in a Check
+        for(ChessMove potentialMove : potentiallyValid){
+            // I should double check that this will do what I want it to do...
+            ChessBoard potentialBoard = squares.makeDuplicate();
+            potentialBoard.makeMove(potentialMove);
+            if(!isInCheck(teamColor)){
+                actuallyValid.add(potentialMove);
+            }
+        }
+        return actuallyValid;
     }
 
     /**
