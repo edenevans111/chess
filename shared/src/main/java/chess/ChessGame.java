@@ -60,10 +60,11 @@ public class ChessGame {
         Collection<ChessMove> potentiallyValid = squares.getPiece(startPosition).pieceMoves(squares, startPosition);
         // for each of the moves, check to see if they would result in a Check
         for(ChessMove potentialMove : potentiallyValid){
-            // I should double check that this will do what I want it to do...
             ChessBoard potentialBoard = squares.makeDuplicate();
             potentialBoard.makeMove(potentialMove);
-            if(!isInCheck(teamColor)){
+            ChessGame potentialGame = new ChessGame();
+            potentialGame.setBoard(potentialBoard);
+            if(!potentialGame.isInCheck(teamColor)){
                 actuallyValid.add(potentialMove);
             }
         }
@@ -77,7 +78,29 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // throw new InvalidMoveException("Reason it is not valid")
+        // check to see if there is something at the startPosition of the move
+        if(move.getStartPosition() == null){
+            throw new InvalidMoveException("There is nothing at that position");
+        }
+        // then make sure that the piece at the startPosition is teamColor
+        ChessPosition startPosition = move.getStartPosition();
+        if(squares.getPiece(startPosition).getTeamColor() != teamTurn){
+            throw new InvalidMoveException("Not your turn");
+        }
+        // if it is the right color: get all of the potentialValid moves it can make
+        Collection<ChessMove> potentialMoves = validMoves(startPosition);
+        if(potentialMoves.contains(move)){
+            squares.makeMove(move);
+            if(teamTurn == TeamColor.WHITE){
+                teamTurn = TeamColor.BLACK;
+            } else{
+                teamTurn = TeamColor.WHITE;
+            }
+        }
+        // check if the move is in the valid moves
+            // if it is valid, make the move
+            // set the new teamColor
     }
 
     /**
@@ -153,7 +176,14 @@ public class ChessGame {
         if(isInCheck(teamColor)){
             return false;
         }
-        return false;
+        Collection<ChessPosition> positions = squares.teamPositions(teamColor);
+        for(ChessPosition position : positions){
+            Collection<ChessMove> potentialMoves = validMoves(position);
+            if(!potentialMoves.isEmpty()){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
