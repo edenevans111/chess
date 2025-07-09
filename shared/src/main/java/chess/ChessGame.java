@@ -55,7 +55,6 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> actuallyValid = new ArrayList<>();
-
         ChessPiece piece = squares.getPiece(startPosition);
         ChessGame.TeamColor teamColor = piece.getTeamColor();
         // need to get all the potential moves of the piece
@@ -96,10 +95,20 @@ public class ChessGame {
         }
         // if it is the right color: get all of the potentialValid moves it can make
         Collection<ChessMove> potentialMoves = validMoves(startPosition);
-        if(!potentialMoves.contains(move) || potentialMoves.isEmpty()){
+        if(!potentialMoves.contains(move)){
             throw new InvalidMoveException("Move is not valid");
         }
-        squares.makeMove(move);
+        boolean isPromotion = (piece.getPieceType() == ChessPiece.PieceType.PAWN) &&
+                (move.getPromotionPiece() != null);
+        if(isPromotion){
+            // need to remove the pawn
+            squares.removePiece(startPosition);
+            ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.QUEEN);
+            squares.addPiece(endPosition, promotedPiece);
+            // make a new ChessPiece to replace the pawn and addPiece to position
+        } else{
+            squares.makeMove(move);
+        }
         if(piece.getTeamColor() == TeamColor.WHITE){
             this.setTeamTurn(TeamColor.BLACK);
         } else{
@@ -160,7 +169,9 @@ public class ChessGame {
             for(ChessMove move : movesOfPiece){
                 ChessBoard potentialBoard = squares.makeDuplicate();
                 potentialBoard.makeMove(move);
-                if(!isInCheck(teamColor)){
+                ChessGame potentialGame = new ChessGame();
+                potentialGame.setBoard(potentialBoard);
+                if(!potentialGame.isInCheck(teamColor)){
                     return false;
                 }
             }

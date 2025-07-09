@@ -82,8 +82,8 @@ public class ChessBoard {
     }
 
     public ChessPosition kingPosition(ChessGame.TeamColor teamColor){
-        for (int i = 1; i < 8; i++) {
-            for (int j = 1; j < 8; j++) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 if(getPiece(new ChessPosition(i, j)) != null){
                     if(getPiece(new ChessPosition(i , j)).getPieceType() == ChessPiece.PieceType.KING){
                         if(getPiece(new ChessPosition(i , j)).getTeamColor() == teamColor){
@@ -98,8 +98,8 @@ public class ChessBoard {
 
     public Collection<ChessPosition> teamPositions(ChessGame.TeamColor teamColor){
         Collection<ChessPosition> positions = new ArrayList<>();
-        for (int i = 1; i < 8; i++) {
-            for (int j = 1; j < 8; j++) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 if(getPiece(new ChessPosition(i, j)) != null){
                     if(getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor){
                         positions.add(new ChessPosition(i, j));
@@ -135,7 +135,7 @@ public class ChessBoard {
         this.removePiece(startPosition);
     }
 
-    private void removePiece(ChessPosition position){
+    public void removePiece(ChessPosition position){
         squares[position.getRow()-1][position.getColumn()-1] = null;
     }
 
