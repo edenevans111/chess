@@ -103,9 +103,8 @@ public class ChessGame {
         if(isPromotion){
             // need to remove the pawn
             squares.removePiece(startPosition);
-            ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.QUEEN);
+            ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
             squares.addPiece(endPosition, promotedPiece);
-            // make a new ChessPiece to replace the pawn and addPiece to position
         } else{
             squares.makeMove(move);
         }
