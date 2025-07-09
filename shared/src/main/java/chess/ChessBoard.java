@@ -112,13 +112,14 @@ public class ChessBoard {
 
     public ChessBoard makeDuplicate(){
         ChessBoard copy = new ChessBoard();
-        for (int i = 1; i < 8; i++) {
-            for (int j = 1; j < 8; j++) {
-                if(this.squares != null){
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                     ChessPosition position = new ChessPosition(i,j);
-                    ChessPiece piece = new ChessPiece(getPiece(position).getTeamColor(), getPiece(position).getPieceType());
-                    copy.addPiece(new ChessPosition(i, j), piece);
-                }
+                    ChessPiece piece = getPiece(position);
+                    if(piece != null){
+                        ChessPiece newPiece = new ChessPiece(getPiece(position).getTeamColor(), getPiece(position).getPieceType());
+                        copy.addPiece(position, newPiece);
+                    }
             }
         }
         return copy;
@@ -128,6 +129,7 @@ public class ChessBoard {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece piece = this.getPiece(startPosition);
+
         // I am not sure that I am doing this correctly
         this.addPiece(endPosition, piece);
         this.removePiece(startPosition);
