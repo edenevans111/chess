@@ -16,7 +16,7 @@ public class Rook implements PieceMoveCalculator{
                 ChessPosition endPosition = new ChessPosition(startPosition.getRow()
                         + (i * direction[0]), startPosition.getColumn() + (i * direction[1]));
                 if (!endPosition.isOnBoard()) {
-                    break;
+                    continue;
                 }
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
                 if (pieceAtEnd != null) {

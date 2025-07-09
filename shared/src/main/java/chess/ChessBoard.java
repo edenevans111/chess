@@ -136,7 +136,7 @@ public class ChessBoard {
     }
 
     private void removePiece(ChessPosition position){
-        squares[position.getRow()][position.getColumn()] = null;
+        squares[position.getRow()-1][position.getColumn()-1] = null;
     }
 
     @Override
