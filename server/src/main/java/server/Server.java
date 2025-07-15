@@ -29,37 +29,46 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
-    // I will need to change all of these to not be void-it's making everything in the run method red...
+    // these methods operate as the handlers:
 
-    private void registerUser(Request request, Response response){
+    private Object registerUser(Request request, Response response){
         System.out.println("This is the registerUser method");
+
+        return "";
     }
 
-    private void login(Request request, Response response){
+    private Object login(Request request, Response response){
         System.out.println("This is the login method");
+
+        return "";
     }
 
-    private void logout(Request request, Response response){
+    private Object logout(Request request, Response response){
         System.out.println("This is the logout method");
+
+        return "";
     }
 
-    private void listGames(Request request, Response response){
+    private Object listGames(Request request, Response response){
         System.out.println("This is the listGames method");
+
+        return "";
     }
 
-    private void createGame(Request request, Response response){
+    private Object createGame(Request request, Response response){
         System.out.println("This is the createGame method");
+
+        return "";
     }
 
     private Object deleteEverything(Request request, Response response){
-        System.out.println("This is the deleteEverything method");
         response.type("application/json");
         service.Service service = new service.Service();
         try {
             service.clearEverything();
         } catch (DataAccessException e) {
             response.status(500);
-            return "Error"; // this is the error response body
+            return String.format("\"message\": \"Error: %s", e.getMessage());
         }
         response.status(200);
         return "";
