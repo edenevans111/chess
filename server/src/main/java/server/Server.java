@@ -28,4 +28,31 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+    // I will need to change all of these to not be void-it's making everything in the run method red...
+    
+    private void registerUser(Request request, Response response){
+        System.out.println("This is the registerUser method");
+    }
+
+    private void login(Request request, Response response){
+        System.out.println("This is the login method");
+    }
+
+    private void logout(Request request, Response response){
+        System.out.println("This is the logout method");
+    }
+
+    private void listGames(Request request, Response response){
+        System.out.println("This is the listGames method");
+    }
+
+    private void createGame(Request request, Response response){
+        System.out.println("This is the createGame method");
+    }
+
+    private void deleteEverything(Request request, Response response){
+        System.out.println("This is the deleteEverything method");
+    }
+
+
 }
