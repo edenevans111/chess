@@ -1,19 +1,38 @@
 package service;
 
 import dataaccess.*;
-import model.dataaccess.UserData;
+import request.ClearRequest;
+import response.ClearResponse;
 
 public class Service {
-    public void clearEverything() throws DataAccessException {
-        GameDAO gameDAO = null; // eventually these won't be null...I don't know exactly how that will go down though
-        UserDAO userDAO = null;
-        AuthDAO authDAO = null;
+    private UserDAO userDAO;
+    private AuthDAO authDAO;
+    private GameDAO gameDAO;
+
+    public Service(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO){
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
+
+    public Service(){}
+
+    public void setUserDAO(UserDAO userDAO){
+        this.userDAO = userDAO;
+    }
+
+    public void setAuthDAO(AuthDAO authDAO){
+        this.authDAO = authDAO;
+    }
+
+    public void setGameDAO(GameDAO gameDAO){
+        this.gameDAO = gameDAO;
+    }
+
+    public ClearResponse clearEverything(ClearRequest clearRequest) throws DataAccessException {
         authDAO.clear();
         userDAO.clear();
         gameDAO.clear();
+        return new ClearResponse();
     }
-
-    // I think I want to implement like the register function here...
-    // I am not at all sure how to do that with the stuff that's supposed to come back from the handler
-
 }

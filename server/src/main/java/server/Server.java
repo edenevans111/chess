@@ -1,9 +1,12 @@
 package server;
 
 import dataaccess.DataAccessException;
+import handler.ClearHandler;
 import spark.*;
 
 public class Server {
+
+    private final ClearHandler clearHandler;
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -11,7 +14,6 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        // Apparently there should be seven, so I need to double-check this...
         Spark.delete("/db", this::deleteEverything);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::login);
@@ -37,13 +39,14 @@ public class Server {
         response.type("application/json");
         service.Service service = new service.Service();
         try {
+            String result = clearHandler.clearEverything();
             service.clearEverything();
         } catch (DataAccessException e) {
             response.status(500);
-            return String.format("\"message\": \"Error: %s", e.getMessage());
+            return String.format("{\"message\": \"Error: %s\"}", e.getMessage());
         }
         response.status(200);
-        return "";
+        return "Clear Successful";
     }
 
     private Object registerUser(Request request, Response response){
