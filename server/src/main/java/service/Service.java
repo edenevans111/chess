@@ -29,7 +29,7 @@ public class Service {
         this.gameDAO = gameDAO;
     }
 
-    public ClearResponse clearEverything(ClearRequest clearRequest) throws DataAccessException {
+    public ClearResponse clearEverything() throws DataAccessException {
         authDAO.clear();
         userDAO.clear();
         gameDAO.clear();

@@ -1,12 +1,10 @@
 package server;
 
 import dataaccess.DataAccessException;
-import handler.ClearHandler;
 import spark.*;
 
 public class Server {
 
-    private final ClearHandler clearHandler;
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -39,18 +37,21 @@ public class Server {
         response.type("application/json");
         service.Service service = new service.Service();
         try {
-            String result = clearHandler.clearEverything();
             service.clearEverything();
         } catch (DataAccessException e) {
             response.status(500);
             return String.format("{\"message\": \"Error: %s\"}", e.getMessage());
         }
         response.status(200);
+        // make sure to get rid of the message before submitting
+        // return "{}";
         return "Clear Successful";
     }
 
     private Object registerUser(Request request, Response response){
-        System.out.println("This is the registerUser method");
+        response.type("application/json");
+        // I think for this one I need to make the new UserService class that will handle the
+        // registering a new user
 
         return "";
     }
