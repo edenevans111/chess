@@ -11,12 +11,14 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        // Apparently there should be seven, so I need to double-check this...
+        Spark.delete("/db", this::deleteEverything);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
-        Spark.delete("/db", this::deleteEverything);
+        Spark.put("/game", this::joinGame);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -29,7 +31,20 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+
     // these methods operate as the handlers:
+    private Object deleteEverything(Request request, Response response){
+        response.type("application/json");
+        service.Service service = new service.Service();
+        try {
+            service.clearEverything();
+        } catch (DataAccessException e) {
+            response.status(500);
+            return String.format("\"message\": \"Error: %s", e.getMessage());
+        }
+        response.status(200);
+        return "";
+    }
 
     private Object registerUser(Request request, Response response){
         System.out.println("This is the registerUser method");
@@ -61,18 +76,9 @@ public class Server {
         return "";
     }
 
-    private Object deleteEverything(Request request, Response response){
-        response.type("application/json");
-        service.Service service = new service.Service();
-        try {
-            service.clearEverything();
-        } catch (DataAccessException e) {
-            response.status(500);
-            return String.format("\"message\": \"Error: %s", e.getMessage());
-        }
-        response.status(200);
+    private Object joinGame(Request request, Response response){
+        System.out.println("This is the joinGame method");
+
         return "";
     }
-
-
 }
