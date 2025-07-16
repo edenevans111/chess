@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.dataaccess.GameData;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -12,9 +13,10 @@ public class MemoryGameDAO implements GameDAO{
     private int nextID = 1;
     private HashSet<GameData> games;
 
-    private MemoryGameDAO(){
-
+    public MemoryGameDAO(){
+        games = new HashSet<>();
     }
+
     @Override
     public void clear() throws DataAccessException {
         games.clear();
@@ -24,11 +26,18 @@ public class MemoryGameDAO implements GameDAO{
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(nextID,whiteUsername, blackUsername, gameName, game);
         games.add(gameData);
+        // make sure to increment the next ID so each one is unique
+        nextID++;
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        return null;
+        for(GameData game : games){
+            if(game.gameID() == gameID){
+                return game;
+            }
+        }
+        throw new DataAccessException("No game with ID " + gameID);
     }
 
     @Override
@@ -37,7 +46,9 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void updateGame(int gameID) throws DataAccessException {
-
+    public void updateGame(GameData gameData) throws DataAccessException {
+        int gameID = gameData.gameID();
+        games.remove(getGame(gameID));
+        games.add(gameData);
     }
 }
