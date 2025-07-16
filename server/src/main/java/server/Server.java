@@ -1,6 +1,10 @@
 package server;
 
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import request.*;
+import response.RegisterResponse;
+import service.UserService;
 import spark.*;
 
 public class Server {
@@ -43,17 +47,22 @@ public class Server {
             return String.format("{\"message\": \"Error: %s\"}", e.getMessage());
         }
         response.status(200);
-        // make sure to get rid of the message before submitting
-        // return "{}";
-        return "Clear Successful";
+        return "{}";
     }
 
-    private Object registerUser(Request request, Response response){
+    private Object registerUser(Request request, Response response) throws DataAccessException{
         response.type("application/json");
-        // I think for this one I need to make the new UserService class that will handle the
-        // registering a new user
-
-        return "";
+        service.UserService service = new UserService();
+        var serializer = new Gson();
+        try{
+            RegisterRequest registerRequest = serializer.fromJson(request.body(), RegisterRequest.class);
+            RegisterResponse registerResponse = service.register(registerRequest);
+            response.status(200);
+            return serializer.toJson(registerResponse);
+        } catch(DataAccessException e){
+            response.status(500);
+            return String.format("{\"message\": \"Error: %s\"}", e.getMessage());
+        }
     }
 
     private Object login(Request request, Response response){

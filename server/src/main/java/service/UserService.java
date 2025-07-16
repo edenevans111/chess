@@ -39,9 +39,33 @@ public class UserService {
         }
     }
 
-    public LoginResult login(LoginRequest loginRequest) {}
+    public LoginResponse login(LoginRequest loginRequest) throws DataAccessException{
+        String username = loginRequest.username();
+        String password = loginRequest.password();
+        UserData userData = userDAO.getUser(username);
+        if(userData.username() != null) {
+            if (userData.password() == password) {
+                String authToken = UUID.randomUUID().toString();
+                AuthData authdata = new AuthData(authToken, username);
+                authDAO.createAuth(authdata);
+                return new LoginResponse(username, authToken);
+            } else {
+                throw new DataAccessException("wrong password");
+            }
+        } else{
+            throw new DataAccessException("username not found");
+        }
+    }
 
-    public void logout(LogoutRequest logoutRequest) {}
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException{
+        String authToken = logoutRequest.authToken();
+        AuthData authData = authDAO.getAuth(authToken);
+        if(authData.authToken() != null){
+            authDAO.deleteAuth(authToken);
+        } else {
+            throw new DataAccessException("authToken is not valid");
+        }
+    }
 
 
 }

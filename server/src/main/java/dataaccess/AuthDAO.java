@@ -7,10 +7,7 @@ import model.dataaccess.AuthData;
 // a AuthMemoryDataAccess class that implements this interface in Memory, then later we'll add a SQLDataAccess class
 public interface AuthDAO {
     void clear() throws DataAccessException;
-
     void createAuth(AuthData authData) throws DataAccessException;
-
     AuthData getAuth(String authToken) throws DataAccessException;
-
     void deleteAuth(String authToken) throws DataAccessException;
 }
