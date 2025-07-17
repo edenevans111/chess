@@ -10,7 +10,7 @@ public class MemoryAuthDAO implements AuthDAO{
     private HashSet<AuthData> authDataSet;
 
     public MemoryAuthDAO(){
-        authDataSet = new HashSet<>();
+        this.authDataSet = new HashSet<>();
     }
 
     public static String generateToken(){

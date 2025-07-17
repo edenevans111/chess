@@ -5,6 +5,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import model.dataaccess.AuthData;
 import model.dataaccess.GameData;
 import request.*;
 import response.*;
@@ -41,36 +42,30 @@ public class GameService {
     }
 
     public JoinResponse joinGame(JoinRequest joinRequest, String authToken) throws DataAccessException {
-        // here I will need to somehow update the game information with the usernames...
         int gameID = joinRequest.gameID();
         ChessGame.TeamColor playerColor = joinRequest.playerColor();
-        // now I need to check that it is an actual game
-        if(gameDAO.getGame(gameID) == null){
+        GameData game = gameDAO.getGame(gameID);
+        if(playerColor == null){
             throw new DataAccessException("Error: bad request");
         }
-        // now I need to check that the authToken is good...
-        if(authDAO.getAuth(authToken) == null){
+        if(game == null){
+            throw new DataAccessException("Error: bad request");
+        }
+        AuthData auth = authDAO.getAuth(authToken);
+        if(auth == null){
             throw new DataAccessException("Error: unauthorized");
         }
-        // now I need to make sure that the color is the right one...
-        if(gameDAO.getGame(gameID).whiteUsername() != null && playerColor == ChessGame.TeamColor.WHITE){
+        if(game.whiteUsername() != null && playerColor == ChessGame.TeamColor.WHITE){
             throw new DataAccessException("Error: already taken");
         }
-        else if(gameDAO.getGame(gameID).blackUsername() != null && playerColor == ChessGame.TeamColor.BLACK){
+        else if(game.blackUsername() != null && playerColor == ChessGame.TeamColor.BLACK){
             throw new DataAccessException("Error: already taken");
         }
-        // if it passes through all of those things, then we need to update the GameData with the new username for
-        // the proper color
-        if(playerColor == ChessGame.TeamColor.BLACK){
-            GameData gameData = new GameData(gameID, gameDAO.getGame(gameID).whiteUsername(),
-                    authDAO.getAuth(authToken).username(), gameDAO.getGame(gameID).gameName(), gameDAO.getGame(gameID).game());
-            gameDAO.updateGame(gameData);
-        } else {
-            GameData gameData = new GameData(gameID, authDAO.getAuth(authToken).username(),
-                    gameDAO.getGame(gameID).blackUsername(), gameDAO.getGame(gameID).gameName(), gameDAO.getGame(gameID).game());
-            gameDAO.updateGame(gameData);
-        }
+        String username = auth.username();
+        String newWhite = (playerColor == ChessGame.TeamColor.WHITE) ? username : game.whiteUsername();
+        String newBlack = (playerColor == ChessGame.TeamColor.BLACK) ? username : game.blackUsername();
+        GameData updated = new GameData(game.gameID(), newWhite, newBlack, game.gameName(), game.game());
+        gameDAO.updateGame(updated);
         return new JoinResponse(gameID);
     }
-
 }

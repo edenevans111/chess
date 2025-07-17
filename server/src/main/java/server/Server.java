@@ -10,15 +10,15 @@ import spark.*;
 
 public class Server {
 
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final AuthDAO authDAO = new MemoryAuthDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
 
 
     public Server() throws DataAccessException{
-        UserDAO userDAO = this.userDAO;
-        AuthDAO authDAO = this.authDAO;
-        GameDAO gameDAO = this.gameDAO;
+        this.userDAO = new MemoryUserDAO();
+        this.authDAO = new MemoryAuthDAO();
+        this.gameDAO = new MemoryGameDAO();
     }
 
     public int run(int desiredPort) {
@@ -50,7 +50,7 @@ public class Server {
     // these methods operate as the handlers:
     private Object deleteEverything(Request request, Response response){
         response.type("application/json");
-        service.Service service = new service.Service();
+        service.Service service = new service.Service(userDAO, authDAO, gameDAO);
         try {
             service.clearEverything();
         } catch (DataAccessException e) {
@@ -91,35 +91,34 @@ public class Server {
     private Object login(Request request, Response response) throws DataAccessException{
         response.type("application/json");
         service.UserService service = new UserService(userDAO, authDAO, gameDAO);
-        var serializer = new Gson();
+        Gson serializer = new Gson();
         try{
             LoginRequest loginRequest = serializer.fromJson(request.body(), LoginRequest.class);
             LoginResponse loginResponse = service.login(loginRequest);
             response.status(200);
             return serializer.toJson(loginResponse);
         } catch (DataAccessException e){
-            String msg = e.getMessage();
+            String msg = e.getMessage() != null ? e.getMessage() : "";
             if(msg.contains("Error: bad request")){
                 response.status(400);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             } else if(msg.contains("Error: unauthorized")){
                 response.status(401);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
             else{
                 response.status(500);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
+            return String.format("{\"message\": \"Error: %s\"}", msg);
         }
     }
 
     private Object logout(Request request, Response response) throws DataAccessException{
         response.type("application/json");
         service.UserService service = new UserService(userDAO, authDAO, gameDAO);
-        var serializer = new Gson();
+        Gson serializer = new Gson();
         try{
             LogoutRequest logoutRequest = serializer.fromJson(request.body(), LogoutRequest.class);
-            service.logout(logoutRequest);
+            String authToken = request.headers("authorization");
+            service.logout(logoutRequest, authToken);
             response.status(200);
             return "{}";
         } catch (DataAccessException e) {

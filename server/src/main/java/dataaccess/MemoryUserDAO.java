@@ -10,7 +10,7 @@ public class MemoryUserDAO implements UserDAO{
     private HashSet<UserData> userDataSet;
 
     public MemoryUserDAO(){
-        userDataSet = new HashSet<>();
+        this.userDataSet = new HashSet<>();
     }
 
     @Override

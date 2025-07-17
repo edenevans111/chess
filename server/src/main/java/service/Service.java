@@ -15,8 +15,6 @@ public class Service {
         this.gameDAO = gameDAO;
     }
 
-    public Service(){}
-
     public void setUserDAO(UserDAO userDAO){
         this.userDAO = userDAO;
     }

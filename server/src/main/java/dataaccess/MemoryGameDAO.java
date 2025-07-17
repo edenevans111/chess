@@ -14,7 +14,7 @@ public class MemoryGameDAO implements GameDAO{
     private HashSet<GameData> games;
 
     public MemoryGameDAO(){
-        games = new HashSet<>();
+        this.games = new HashSet<>();
     }
 
     @Override
