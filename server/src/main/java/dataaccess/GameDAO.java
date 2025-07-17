@@ -3,6 +3,7 @@ package dataaccess;
 import model.dataaccess.GameData;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public interface GameDAO {
@@ -14,7 +15,7 @@ public interface GameDAO {
 
     // I am not sure if I will need to fix this later, since I don't know if that's technically correct for when we
     // need the SQL stuff...
-    HashSet<GameData> listGames() throws DataAccessException;
+    HashMap<Integer, GameData> listGames() throws DataAccessException;
 
     void updateGame(GameData gameData) throws DataAccessException;
 

@@ -139,7 +139,7 @@ public class Server {
     private Object listGames(Request request, Response response) throws DataAccessException{
         response.type("application/json");
         service.GameService service = new GameService(userDAO, authDAO, gameDAO);
-        var serializer = new Gson();
+        Gson serializer = new Gson();
         try{
             ListRequest listrequest = serializer.fromJson(request.body(), ListRequest.class);
             String authToken = request.headers("authorization");
@@ -161,7 +161,7 @@ public class Server {
     private Object createGame(Request request, Response response) throws DataAccessException{
         response.type("application/json");
         service.GameService service = new GameService(userDAO, authDAO, gameDAO);
-        var serializer = new Gson();
+        Gson serializer = new Gson();
         try{
             CreateRequest createRequest = serializer.fromJson(request.body(), CreateRequest.class);
             String authToken = request.headers("authorization");
@@ -186,7 +186,7 @@ public class Server {
     private Object joinGame(Request request, Response response) throws DataAccessException{
         response.type("application/json");
         service.GameService service = new GameService(userDAO, authDAO, gameDAO);
-        var serializer = new Gson();
+        Gson serializer = new Gson();
         try{
             JoinRequest joinRequest = serializer.fromJson(request.body(), JoinRequest.class);
             String authToken = request.headers("authorization");
@@ -197,18 +197,15 @@ public class Server {
             String msg = e.getMessage();
             if (msg.contains("Error: bad request")) {
                 response.status(400);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             } else if (msg.contains("Error: unauthorized")) {
                 response.status(401);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             } else if (msg.contains("Error: already taken")) {
                 response.status(403);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
             else {
                 response.status(500);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
+            return String.format("{\"message\": \"Error: %s\"}", msg);
         }
     }
 }
