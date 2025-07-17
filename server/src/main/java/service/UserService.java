@@ -23,13 +23,17 @@ public class UserService {
         String username = registerRequest.username();
         String password = registerRequest.password();
         String email = registerRequest.email();
-        if(username == null || password == null || email == null){
+        if(username == null || password == null || email == null || username.isBlank() ||
+        password.isBlank() || email.isBlank()){
             throw new DataAccessException("Error: bad request");
         }
         try{
             userDAO.getUser(username);
             throw new DataAccessException("Error: already taken");
         } catch(DataAccessException e){
+            if(!"Error: unauthorized".equals(e.getMessage())){
+                throw e;
+            }
             UserData userData = new UserData(username, password, email);
             userDAO.createUser(userData);
 
@@ -43,25 +47,26 @@ public class UserService {
     public LoginResponse login(LoginRequest loginRequest) throws DataAccessException{
         String username = loginRequest.username();
         String password = loginRequest.password();
+        if(username == null || password == null || username.isBlank() || password.isBlank()){
+            throw new DataAccessException("Error: bad request");
+        }
         UserData userData = userDAO.getUser(username);
-            if (userData.password().equals(password)) {
-                String authToken = UUID.randomUUID().toString();
-                AuthData authdata = new AuthData(authToken, username);
-                authDAO.createAuth(authdata);
-                return new LoginResponse(username, authToken);
-            } else{
-                throw new DataAccessException("Error: unauthorized");
-            }
-    }
-
-    public void logout(LogoutRequest logoutRequest, String authToken) throws DataAccessException{
-        AuthData authData = authDAO.getAuth(authToken);
-        if(authData.authToken() != null){
-            authDAO.deleteAuth(authToken);
-        } else {
-            throw new DataAccessException("authToken is not valid");
+        if (userData.password().equals(password)) {
+            String authToken = UUID.randomUUID().toString();
+            AuthData authdata = new AuthData(authToken, username);
+            authDAO.createAuth(authdata);
+            return new LoginResponse(username, authToken);
+        } else{
+            throw new DataAccessException("Error: unauthorized");
         }
     }
 
-
+    public void logout(LogoutRequest logoutRequest, String authToken) throws DataAccessException{
+        try{
+            AuthData authData = authDAO.getAuth(authToken);
+            authDAO.deleteAuth(authToken);
+        } catch(DataAccessException e){
+            throw new DataAccessException("Error: unauthorized");
+        }
+    }
 }

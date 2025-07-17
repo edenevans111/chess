@@ -3,6 +3,7 @@ package dataaccess;
 import model.dataaccess.AuthData;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO{
@@ -41,9 +42,12 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        for(AuthData authData : authDataSet){
+        Iterator<AuthData> iterator = authDataSet.iterator();
+        while(iterator.hasNext()){
+            AuthData authData = iterator.next();
             if(authData.authToken().equals(authToken)){
-                authDataSet.remove(authData);
+                iterator.remove();
+                return;
             }
         }
         throw new DataAccessException("Error: unauthorized");
