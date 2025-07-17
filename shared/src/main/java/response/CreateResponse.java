@@ -1,4 +1,4 @@
 package response;
 
-public record CreateResponse(String gameName) {
+public record CreateResponse(int gameID, String gameName) {
 }

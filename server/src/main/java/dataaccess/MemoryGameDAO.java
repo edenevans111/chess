@@ -22,11 +22,13 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
+    public int createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(nextID,null, null, gameName, game);
         games.put(nextID, gameData);
+        int toReturn = nextID;
         nextID++;
+        return toReturn;
     }
 
     @Override

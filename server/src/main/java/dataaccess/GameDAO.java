@@ -9,7 +9,7 @@ import java.util.HashSet;
 public interface GameDAO {
     void clear() throws DataAccessException;
 
-    void createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException;
+    int createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException;
 
     GameData getGame(int gameID) throws DataAccessException;
 

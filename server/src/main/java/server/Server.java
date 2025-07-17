@@ -166,7 +166,7 @@ public class Server {
 
     private Object createGame(Request request, Response response) throws DataAccessException{
         response.type("application/json");
-        service.GameService service = new GameService(userDAO, authDAO, gameDAO);
+        GameService service = new GameService(userDAO, authDAO, gameDAO);
         Gson serializer = new Gson();
         try{
             CreateRequest createRequest = serializer.fromJson(request.body(), CreateRequest.class);
@@ -178,14 +178,12 @@ public class Server {
             String msg = e.getMessage();
             if (msg.contains("Error: bad request")) {
                 response.status(400);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             } else if (msg.contains("Error: unauthorized")) {
                 response.status(401);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             } else {
                 response.status(500);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
+            return String.format("{\"message\": \"%s\"}", msg);
         }
     }
 

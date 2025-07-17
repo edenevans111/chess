@@ -35,11 +35,11 @@ public class GameService {
     }
 
     public CreateResponse createGame(CreateRequest createRequest, String authToken) throws DataAccessException {
-        if(authDAO.getAuth(authToken) == null){
+        if(authDAO.getAuth(authToken) == null || authToken.isBlank()){
             throw new DataAccessException("Error: unauthorized");
         }
-        gameDAO.createGame(null, null, createRequest.gameName());
-        return new CreateResponse(createRequest.gameName());
+        int gameID = gameDAO.createGame(null, null, createRequest.gameName());
+        return new CreateResponse(gameID, createRequest.gameName());
     }
 
     public JoinResponse joinGame(JoinRequest joinRequest, String authToken) throws DataAccessException {
