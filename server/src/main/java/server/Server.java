@@ -53,9 +53,18 @@ public class Server {
         service.Service service = new service.Service(userDAO, authDAO, gameDAO);
         try {
             service.clearEverything();
-        } catch (DataAccessException e) {
-            response.status(500);
-            return String.format("{\"message\": \"Error: %s\"}", e.getMessage());
+        } catch(DataAccessException e){
+            String msg = e.getMessage();
+            if(msg.contains("Error: unauthorized")){
+                response.status(401);
+            }
+            else if(msg.contains("Error: bad request")){
+                response.status(400);
+            }
+            else{
+                response.status(500);
+            }
+            return String.format("{\"message\": \"Error: %s\"}", msg);
         }
         response.status(200);
         return "{}";
@@ -63,28 +72,25 @@ public class Server {
 
     private Object registerUser(Request request, Response response) throws DataAccessException{
         response.type("application/json");
-        // I need to figure out how to fix this...
         service.UserService service = new UserService(userDAO, authDAO, gameDAO);
-        var serializer = new Gson();
+        Gson serializer = new Gson();
         try{
             RegisterRequest registerRequest = serializer.fromJson(request.body(), RegisterRequest.class);
             RegisterResponse registerResponse = service.register(registerRequest);
             response.status(200);
             return serializer.toJson(registerResponse);
         } catch(DataAccessException e){
-            String msg = e.getMessage();
+            String msg = (e.getMessage() != null) ? e.getMessage() : "";
             if(msg.contains("Error: already taken")){
                 response.status(403);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
             else if(msg.contains("Error: bad request")){
                 response.status(400);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
             else{
                 response.status(500);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
             }
+            return String.format("{\"message\": \"%s\"}", msg);
         }
     }
 
@@ -107,7 +113,7 @@ public class Server {
             else{
                 response.status(500);
             }
-            return String.format("{\"message\": \"Error: %s\"}", msg);
+            return String.format("{\"message\": \"%s\"}", msg);
         }
     }
 

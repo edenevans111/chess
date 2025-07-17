@@ -24,7 +24,6 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        // create a new AuthData Object with all the new information
         AuthData authData1 = new AuthData(authData.authToken(), authData.username());
         authDataSet.add(authData1);
     }
@@ -36,7 +35,8 @@ public class MemoryAuthDAO implements AuthDAO{
                 return authData;
             }
         }
-        throw new DataAccessException("Error: bad request");
+        // this should be the correct error message now
+        throw new DataAccessException("Error: unauthorized");
     }
 
     @Override
@@ -46,6 +46,6 @@ public class MemoryAuthDAO implements AuthDAO{
                 authDataSet.remove(authData);
             }
         }
-        throw new DataAccessException("Did not find authToken");
+        throw new DataAccessException("Error: unauthorized");
     }
 }

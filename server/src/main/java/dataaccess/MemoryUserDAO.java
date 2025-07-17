@@ -31,6 +31,6 @@ public class MemoryUserDAO implements UserDAO{
                 return user;
             }
         }
-        throw new DataAccessException("Did not find username");
+        throw new DataAccessException("Error: unauthorized");
     }
 }

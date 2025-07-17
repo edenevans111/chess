@@ -18,7 +18,9 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public void clear() throws DataAccessException {
         games.clear();
+        nextID = 1;
     }
+
     @Override
     public void createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
