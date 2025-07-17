@@ -36,7 +36,7 @@ public class MemoryAuthDAO implements AuthDAO{
                 return authData;
             }
         }
-        throw new DataAccessException("Authorization Code does not exist");
+        throw new DataAccessException("Error: bad request");
     }
 
     @Override

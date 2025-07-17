@@ -19,8 +19,6 @@ public class UserService {
         this.gameDAO = gameDAO;
     }
 
-    public UserService(){}
-
     public RegisterResponse register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         if(userDAO.getUser(username) == null){
@@ -35,7 +33,7 @@ public class UserService {
             // create RegisterResult with the username and authToken
             return new RegisterResponse(username, authToken);
         } else{
-            throw new DataAccessException("username already exists");
+            throw new DataAccessException("Error: already taken");
         }
     }
 

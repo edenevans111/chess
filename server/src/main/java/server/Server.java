@@ -1,14 +1,25 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import request.*;
-import response.RegisterResponse;
+import response.*;
+import service.GameService;
 import service.UserService;
 import spark.*;
 
 public class Server {
 
+    private final UserDAO userDAO = new MemoryUserDAO();
+    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final GameDAO gameDAO = new MemoryGameDAO();
+
+
+    public Server() throws DataAccessException{
+        UserDAO userDAO = this.userDAO;
+        AuthDAO authDAO = this.authDAO;
+        GameDAO gameDAO = this.gameDAO;
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -52,7 +63,8 @@ public class Server {
 
     private Object registerUser(Request request, Response response) throws DataAccessException{
         response.type("application/json");
-        service.UserService service = new UserService();
+        // I need to figure out how to fix this...
+        service.UserService service = new UserService(userDAO, authDAO, gameDAO);
         var serializer = new Gson();
         try{
             RegisterRequest registerRequest = serializer.fromJson(request.body(), RegisterRequest.class);
@@ -60,38 +72,144 @@ public class Server {
             response.status(200);
             return serializer.toJson(registerResponse);
         } catch(DataAccessException e){
-            response.status(500);
-            return String.format("{\"message\": \"Error: %s\"}", e.getMessage());
+            String msg = e.getMessage();
+            if(msg.contains("Error: already taken")){
+                response.status(403);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+            else if(msg.contains("Error: bad request")){
+                response.status(400);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+            else{
+                response.status(500);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
         }
     }
 
-    private Object login(Request request, Response response){
-        System.out.println("This is the login method");
-
-        return "";
+    private Object login(Request request, Response response) throws DataAccessException{
+        response.type("application/json");
+        service.UserService service = new UserService(userDAO, authDAO, gameDAO);
+        var serializer = new Gson();
+        try{
+            LoginRequest loginRequest = serializer.fromJson(request.body(), LoginRequest.class);
+            LoginResponse loginResponse = service.login(loginRequest);
+            response.status(200);
+            return serializer.toJson(loginResponse);
+        } catch (DataAccessException e){
+            String msg = e.getMessage();
+            if(msg.contains("Error: bad request")){
+                response.status(400);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else if(msg.contains("Error: unauthorized")){
+                response.status(401);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+            else{
+                response.status(500);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+        }
     }
 
-    private Object logout(Request request, Response response){
-        System.out.println("This is the logout method");
-
-        return "";
+    private Object logout(Request request, Response response) throws DataAccessException{
+        response.type("application/json");
+        service.UserService service = new UserService(userDAO, authDAO, gameDAO);
+        var serializer = new Gson();
+        try{
+            LogoutRequest logoutRequest = serializer.fromJson(request.body(), LogoutRequest.class);
+            service.logout(logoutRequest);
+            response.status(200);
+            return "{}";
+        } catch (DataAccessException e) {
+            String msg = e.getMessage();
+            if (msg.contains("Error: bad request")) {
+                response.status(400);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else if (msg.contains("Error: unauthorized")) {
+                response.status(401);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else {
+                response.status(500);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+        }
     }
 
-    private Object listGames(Request request, Response response){
-        System.out.println("This is the listGames method");
-
-        return "";
+    private Object listGames(Request request, Response response) throws DataAccessException{
+        response.type("application/json");
+        service.GameService service = new GameService(userDAO, authDAO, gameDAO);
+        var serializer = new Gson();
+        try{
+            ListRequest listrequest = serializer.fromJson(request.body(), ListRequest.class);
+            String authToken = request.headers("authorization");
+            ListResponse listResponse = service.listOfGames(listrequest, authToken);
+            response.status(200);
+            return serializer.toJson(listResponse);
+        } catch (DataAccessException e){
+            String msg = e.getMessage();
+            if (msg.contains("Error: unauthorized")) {
+                response.status(401);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else {
+                response.status(500);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+        }
     }
 
-    private Object createGame(Request request, Response response){
-        System.out.println("This is the createGame method");
-
-        return "";
+    private Object createGame(Request request, Response response) throws DataAccessException{
+        response.type("application/json");
+        service.GameService service = new GameService(userDAO, authDAO, gameDAO);
+        var serializer = new Gson();
+        try{
+            CreateRequest createRequest = serializer.fromJson(request.body(), CreateRequest.class);
+            String authToken = request.headers("authorization");
+            CreateResponse createResponse = service.createGame(createRequest, authToken);
+            response.status(200);
+            return serializer.toJson(createResponse);
+        } catch (DataAccessException e){
+            String msg = e.getMessage();
+            if (msg.contains("Error: bad request")) {
+                response.status(400);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else if (msg.contains("Error: unauthorized")) {
+                response.status(401);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else {
+                response.status(500);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+        }
     }
 
-    private Object joinGame(Request request, Response response){
-        System.out.println("This is the joinGame method");
-
-        return "";
+    private Object joinGame(Request request, Response response) throws DataAccessException{
+        response.type("application/json");
+        service.GameService service = new GameService(userDAO, authDAO, gameDAO);
+        var serializer = new Gson();
+        try{
+            JoinRequest joinRequest = serializer.fromJson(request.body(), JoinRequest.class);
+            String authToken = request.headers("authorization");
+            JoinResponse joinResponse = service.joinGame(joinRequest, authToken);
+            response.status(200);
+            return serializer.toJson(joinResponse);
+        } catch (DataAccessException e){
+            String msg = e.getMessage();
+            if (msg.contains("Error: bad request")) {
+                response.status(400);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else if (msg.contains("Error: unauthorized")) {
+                response.status(401);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            } else if (msg.contains("Error: already taken")) {
+                response.status(403);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+            else {
+                response.status(500);
+                return String.format("{\"message\": \"Error: %s\"}", msg);
+            }
+        }
     }
 }

@@ -26,7 +26,6 @@ public class MemoryGameDAO implements GameDAO{
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(nextID,whiteUsername, blackUsername, gameName, game);
         games.add(gameData);
-        // make sure to increment the next ID so each one is unique
         nextID++;
     }
 
