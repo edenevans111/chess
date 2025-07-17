@@ -38,6 +38,9 @@ public class GameService {
         if(authDAO.getAuth(authToken) == null || authToken.isBlank()){
             throw new DataAccessException("Error: unauthorized");
         }
+        if(createRequest == null || createRequest.gameName() == null){
+            throw new DataAccessException("Error: bad request");
+        }
         int gameID = gameDAO.createGame(null, null, createRequest.gameName());
         return new CreateResponse(gameID, createRequest.gameName());
     }
