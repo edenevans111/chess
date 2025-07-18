@@ -1,6 +1,6 @@
 package dataaccess;
 
-import model.dataaccess.UserData;
+import model.UserData;
 
 import java.util.HashSet;
 

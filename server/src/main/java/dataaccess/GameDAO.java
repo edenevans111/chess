@@ -1,10 +1,8 @@
 package dataaccess;
 
-import model.dataaccess.GameData;
+import model.GameData;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public interface GameDAO {
     void clear() throws DataAccessException;

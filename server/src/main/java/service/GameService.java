@@ -5,14 +5,12 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import model.dataaccess.AuthData;
-import model.dataaccess.GameData;
+import model.AuthData;
+import model.GameData;
 import request.*;
 import response.*;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class GameService {
 

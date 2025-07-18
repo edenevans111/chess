@@ -1,11 +1,10 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.dataaccess.GameData;
+import model.GameData;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class MemoryGameDAO implements GameDAO{
 

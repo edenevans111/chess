@@ -1,16 +1,14 @@
 package service;
 
 import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
 import chess.InvalidMoveException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
-import model.dataaccess.AuthData;
-import model.dataaccess.GameData;
-import model.dataaccess.UserData;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.CreateRequest;
@@ -19,12 +17,9 @@ import request.ListRequest;
 import response.CreateResponse;
 import response.JoinResponse;
 import response.ListResponse;
-import response.LoginResponse;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;

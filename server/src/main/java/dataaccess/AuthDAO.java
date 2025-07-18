@@ -1,7 +1,7 @@
 package dataaccess;
 
 
-import model.dataaccess.AuthData;
+import model.AuthData;
 
 // for this I think, once it has all the methods that will be needed, I will need to create
 // a AuthMemoryDataAccess class that implements this interface in Memory, then later we'll add a SQLDataAccess class

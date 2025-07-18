@@ -1,7 +1,8 @@
 package service;
 
 import dataaccess.*;
-import model.dataaccess.*;
+import model.AuthData;
+import model.UserData;
 import request.*;
 import response.*;
 
