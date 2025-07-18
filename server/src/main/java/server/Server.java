@@ -15,7 +15,7 @@ public class Server {
     private final GameDAO gameDAO;
 
 
-    public Server() throws DataAccessException{
+    public Server() {
         this.userDAO = new MemoryUserDAO();
         this.authDAO = new MemoryAuthDAO();
         this.gameDAO = new MemoryGameDAO();
