@@ -13,8 +13,6 @@ public interface GameDAO {
 
     GameData getGame(int gameID) throws DataAccessException;
 
-    // I am not sure if I will need to fix this later, since I don't know if that's technically correct for when we
-    // need the SQL stuff...
     Collection<GameData> listGames() throws DataAccessException;
 
     void updateGame(GameData gameData) throws DataAccessException;
