@@ -52,4 +52,8 @@ public class MemoryAuthDAO implements AuthDAO{
         }
         throw new DataAccessException("Error: unauthorized");
     }
+
+    public boolean isEmpty() {
+        return authDataSet.isEmpty();
+    }
 }

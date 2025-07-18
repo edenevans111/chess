@@ -33,4 +33,8 @@ public class MemoryUserDAO implements UserDAO{
         }
         throw new DataAccessException("Error: unauthorized");
     }
+
+    public boolean isEmpty() {
+        return userDataSet.isEmpty();
+    }
 }
