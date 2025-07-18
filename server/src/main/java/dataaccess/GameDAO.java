@@ -15,7 +15,7 @@ public interface GameDAO {
 
     // I am not sure if I will need to fix this later, since I don't know if that's technically correct for when we
     // need the SQL stuff...
-    HashMap<Integer, GameData> listGames() throws DataAccessException;
+    Collection<GameData> listGames() throws DataAccessException;
 
     void updateGame(GameData gameData) throws DataAccessException;
 

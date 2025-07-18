@@ -10,6 +10,7 @@ import model.dataaccess.GameData;
 import request.*;
 import response.*;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -26,7 +27,7 @@ public class GameService {
     }
 
     public ListResponse listOfGames(ListRequest listRequest, String authToken) throws DataAccessException {
-        HashMap<Integer, GameData> games = gameDAO.listGames();
+        Collection<GameData> games = gameDAO.listGames();
         // I need to check the authToken before I can do anything else
         if(authDAO.getAuth(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
@@ -55,6 +56,9 @@ public class GameService {
         if(game == null){
             throw new DataAccessException("Error: bad request");
         }
+        if (authToken == null){
+            throw new DataAccessException("Error: unauthorized");
+        }
         AuthData auth = authDAO.getAuth(authToken);
         if(auth == null){
             throw new DataAccessException("Error: unauthorized");
@@ -70,6 +74,6 @@ public class GameService {
         String newBlack = (playerColor == ChessGame.TeamColor.BLACK) ? username : game.blackUsername();
         GameData updated = new GameData(game.gameID(), newWhite, newBlack, game.gameName(), game.game());
         gameDAO.updateGame(updated);
-        return new JoinResponse(gameID);
+        return new JoinResponse();
     }
 }
