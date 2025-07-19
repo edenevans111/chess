@@ -32,7 +32,7 @@ public class Pawn implements PieceMoveCalculator {
                     moves.add(new ChessMove(startPosition, endPosition));
                 } // end of the for loop
             } // end of the row == 2 statement
-            if (startPosition.getRow() != 2) {
+            else {
                 int[][] directions = {{1, 0}};
                 for (int[] direction : directions) {
                     ChessPosition endPosition = new ChessPosition(startPosition.getRow()
