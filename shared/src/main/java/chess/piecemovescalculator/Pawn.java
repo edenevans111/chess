@@ -1,10 +1,8 @@
-package chess.PieceMovesCalculator;
+package chess.piecemovescalculator;
 import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 
 public class Pawn implements PieceMoveCalculator {

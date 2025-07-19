@@ -1,22 +1,23 @@
-package chess.PieceMovesCalculator;
+package chess.piecemovescalculator;
 
 import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Rook implements PieceMoveCalculator{
+public class Bishop implements PieceMoveCalculator{
     @Override
     public Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition) {
+        // this is where to write what the Bishop does
         Collection<ChessMove> moves = new ArrayList<>();
         ChessGame.TeamColor teamColor = squares.getPiece(startPosition).getTeamColor();
-        int [][] directions = { {0, 1}, {1,0}, {0, -1}, {-1, 0} };
+        int [][] directions = { {1, 1}, {-1, -1}, {1, -1}, {-1, 1} };
         for (int[] direction : directions) {
             for (int i = 1; i < 8; i++) {
                 ChessPosition endPosition = new ChessPosition(startPosition.getRow()
                         + (i * direction[0]), startPosition.getColumn() + (i * direction[1]));
                 if (!endPosition.isOnBoard()) {
-                    continue;
+                    break;
                 }
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
                 if (pieceAtEnd != null) {
