@@ -5,30 +5,12 @@ import chess.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Bishop implements PieceMoveCalculator{
-    @Override
+public class Bishop extends Queen{
+
+    private final int [][] directions = { {1, 1}, {-1, -1}, {1, -1}, {-1, 1} };
+
     public Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition) {
-        // this is where to write what the Bishop does
-        Collection<ChessMove> moves = new ArrayList<>();
-        ChessGame.TeamColor teamColor = squares.getPiece(startPosition).getTeamColor();
-        int [][] directions = { {1, 1}, {-1, -1}, {1, -1}, {-1, 1} };
-        for (int[] direction : directions) {
-            for (int i = 1; i < 8; i++) {
-                ChessPosition endPosition = new ChessPosition(startPosition.getRow()
-                        + (i * direction[0]), startPosition.getColumn() + (i * direction[1]));
-                if (!endPosition.isOnBoard()) {
-                    break;
-                }
-                ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-                if (pieceAtEnd != null) {
-                    if (pieceAtEnd.getTeamColor() != teamColor) {
-                        moves.add(new ChessMove(startPosition, endPosition));
-                    }
-                    break;
-                }
-                moves.add(new ChessMove(startPosition, endPosition));
-            }
-        }
-        return moves;
+        QueenRookBishop bishop = new QueenRookBishop();
+        return bishop.movePiece(directions, squares, startPosition);
     }
 }
