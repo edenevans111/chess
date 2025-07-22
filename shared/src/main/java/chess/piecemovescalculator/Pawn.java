@@ -22,6 +22,34 @@ public class Pawn implements PieceMoveCalculator {
         return moves;
     }
 
+    Collection<ChessMove> normalPawnMoves(int [][] directions, ChessBoard squares, ChessPosition startPosition, int atEnd){
+        Collection<ChessPiece.PieceType> promotionTypes = new ArrayList<>();
+        promotionTypes.add(ChessPiece.PieceType.QUEEN);
+        promotionTypes.add(ChessPiece.PieceType.BISHOP);
+        promotionTypes.add(ChessPiece.PieceType.ROOK);
+        promotionTypes.add(ChessPiece.PieceType.KNIGHT);
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        for (int[] direction : directions) {
+            ChessPosition endPosition = new ChessPosition(startPosition.getRow()
+                    + direction[0], startPosition.getColumn());
+            if (!endPosition.isOnBoard()) break;
+            ChessPiece pieceAtEnd = squares.getPiece(endPosition);
+            if (pieceAtEnd != null) {
+                continue;
+            }
+            if (endPosition.getRow() == atEnd) {
+                for (ChessPiece.PieceType type : promotionTypes) {
+                    moves.add(new ChessMove(startPosition, endPosition, type));
+                }
+            } else {
+                moves.add(new ChessMove(startPosition, endPosition));
+            }
+        }
+
+        return moves;
+    }
+
     @Override
     public Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition) {
         Collection<ChessPiece.PieceType> promotionTypes = new ArrayList<>();
@@ -40,22 +68,7 @@ public class Pawn implements PieceMoveCalculator {
             }
             else {
                 int[][] directions = {{1, 0}};
-                for (int[] direction : directions) {
-                    ChessPosition endPosition = new ChessPosition(startPosition.getRow()
-                            + direction[0], startPosition.getColumn());
-                    if (!endPosition.isOnBoard()) break;
-                    ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-                    if (pieceAtEnd != null) {
-                        continue;
-                    }
-                    if (endPosition.getRow() == 8) {
-                        for (ChessPiece.PieceType type : promotionTypes) {
-                            moves.add(new ChessMove(startPosition, endPosition, type));
-                        }
-                    } else {
-                        moves.add(new ChessMove(startPosition, endPosition));
-                    }
-                } // end of the for loop
+                moves = normalPawnMoves(directions, squares, startPosition, atEnd); // end of the for loop
             } // end of the row != 2 statement
 
             int[][] directions = {{1, 1}, {1, -1}};
@@ -84,22 +97,7 @@ public class Pawn implements PieceMoveCalculator {
             } // end of the row == 2 statement
             if (startPosition.getRow() != 7) {
                 int[][] directions = {{-1, 0}};
-                for (int[] direction : directions) {
-                    ChessPosition endPosition = new ChessPosition(startPosition.getRow()
-                            + direction[0], startPosition.getColumn());
-                    if (!endPosition.isOnBoard()) break;
-                    ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-                    if (pieceAtEnd != null) {
-                        continue;
-                    }
-                    if (endPosition.getRow() == 1) {
-                        for (ChessPiece.PieceType type : promotionTypes) {
-                            moves.add(new ChessMove(startPosition, endPosition, type));
-                        }
-                    } else {
-                        moves.add(new ChessMove(startPosition, endPosition));
-                    }
-                }
+                moves = normalPawnMoves(directions, squares, startPosition, atEnd);
             } // end of the row != 2 statement
 
             int[][] directions = {{-1, 1}, {-1, -1}};
