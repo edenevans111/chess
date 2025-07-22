@@ -11,21 +11,7 @@ public class Knight implements PieceMoveCalculator{
         ChessGame.TeamColor teamColor = squares.getPiece(startPosition).getTeamColor();
         int[][] directions = {{2, 1}, {1, 2}, {-2, 1}, {1, -2},
                 {2, -1}, {-1, 2}, {-2, -1}, {-1, -2}};
-        for (int[] direction : directions) {
-            ChessPosition endPosition = new ChessPosition(startPosition.getRow()
-                    + (direction[0]), startPosition.getColumn() + (direction[1]));
-            if (!endPosition.isOnBoard()) {
-                continue;
-            }
-            ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-            if (pieceAtEnd != null) {
-                if (pieceAtEnd.getTeamColor() != teamColor) {
-                    moves.add(new ChessMove(startPosition, endPosition));
-                }
-                continue;
-            }
-            moves.add(new ChessMove(startPosition, endPosition));
-        }
-        return moves;
+        QueenRookBishop knight = new QueenRookBishop();
+        return knight.kingKnightMethod(directions, squares, startPosition, teamColor);
     }
 }

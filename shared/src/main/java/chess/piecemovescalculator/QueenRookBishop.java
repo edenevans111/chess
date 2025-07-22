@@ -29,4 +29,25 @@ public class QueenRookBishop {
         }
         return moves;
     }
+
+    public Collection<ChessMove> kingKnightMethod(int [][] directions, ChessBoard squares,
+                                                  ChessPosition startPosition, ChessGame.TeamColor teamColor){
+        Collection<ChessMove> moves = new ArrayList<>();
+        for (int[] direction : directions) {
+            ChessPosition endPosition = new ChessPosition(startPosition.getRow()
+                    + (direction[0]), startPosition.getColumn() + (direction[1]));
+            if (!endPosition.isOnBoard()) {
+                continue;
+            }
+            ChessPiece pieceAtEnd = squares.getPiece(endPosition);
+            if (pieceAtEnd != null) {
+                if (pieceAtEnd.getTeamColor() != teamColor) {
+                    moves.add(new ChessMove(startPosition, endPosition));
+                }
+                continue;
+            }
+            moves.add(new ChessMove(startPosition, endPosition));
+        }
+        return moves;
+    }
 }
