@@ -54,6 +54,33 @@ public class Pawn implements PieceMoveCalculator {
         return moves;
     }
 
+    void takePawnMove(Collection<ChessMove> moves, int[][] directions, ChessBoard squares,
+                      ChessPosition startPosition, int atEnd, ChessGame.TeamColor teamColor){
+        Collection<ChessPiece.PieceType> promotionTypes = new ArrayList<>();
+        promotionTypes.add(ChessPiece.PieceType.QUEEN);
+        promotionTypes.add(ChessPiece.PieceType.BISHOP);
+        promotionTypes.add(ChessPiece.PieceType.ROOK);
+        promotionTypes.add(ChessPiece.PieceType.KNIGHT);
+
+        for (int[] direction : directions) {
+            ChessPosition endPosition = new ChessPosition(startPosition.getRow()
+                    + (direction[0]), startPosition.getColumn() + (direction[1]));
+            if (!endPosition.isOnBoard()) {
+                continue;
+            }
+            ChessPiece pieceAtEnd = squares.getPiece(endPosition);
+            if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
+                if (endPosition.getRow() == atEnd) {
+                    for (ChessPiece.PieceType type : promotionTypes) {
+                        moves.add(new ChessMove(startPosition, endPosition, type));
+                    }
+                } else{
+                    moves.add(new ChessMove(startPosition, endPosition));
+                }
+            }
+        }
+    }
+
     @Override
     public Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition) {
         Collection<ChessPiece.PieceType> promotionTypes = new ArrayList<>();
@@ -76,23 +103,7 @@ public class Pawn implements PieceMoveCalculator {
             } // end of the row != 2 statement
 
             int[][] directions = {{1, 1}, {1, -1}};
-            for (int[] direction : directions) {
-                ChessPosition endPosition = new ChessPosition(startPosition.getRow()
-                        + (direction[0]), startPosition.getColumn() + (direction[1]));
-                if (!endPosition.isOnBoard()) {
-                    continue;
-                }
-                ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-                if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
-                    if (endPosition.getRow() == 8) {
-                        for (ChessPiece.PieceType type : promotionTypes) {
-                            moves.add(new ChessMove(startPosition, endPosition, type));
-                        }
-                    } else{
-                        moves.add(new ChessMove(startPosition, endPosition));
-                    }
-                }
-            }
+            takePawnMove(moves, directions, squares, startPosition, atEnd, teamColor);
         }
         // this is for the Black pawns
         if (teamColor == ChessGame.TeamColor.BLACK) {
@@ -104,26 +115,10 @@ public class Pawn implements PieceMoveCalculator {
             if (startPosition.getRow() != 7) {
                 int[][] directions = {{-1, 0}};
                 moves = normalPawnMoves(directions, squares, startPosition, atEnd);
-            } // end of the row != 2 statement
+            }
 
             int[][] directions = {{-1, 1}, {-1, -1}};
-            for (int[] direction : directions) {
-                ChessPosition endPosition = new ChessPosition(startPosition.getRow()
-                        + (direction[0]), startPosition.getColumn() + (direction[1]));
-                if (!endPosition.isOnBoard()) {
-                    continue;
-                }
-                ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-                if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
-                    if (endPosition.getRow() == 1) {
-                        for (ChessPiece.PieceType type : promotionTypes) {
-                            moves.add(new ChessMove(startPosition, endPosition, type));
-                        }
-                    } else{
-                        moves.add(new ChessMove(startPosition, endPosition));
-                    }
-                }
-            }
+            takePawnMove(moves, directions, squares, startPosition, atEnd, teamColor);
         }
         return moves;
     }
