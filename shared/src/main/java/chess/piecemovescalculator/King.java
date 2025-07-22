@@ -14,7 +14,9 @@ public class King implements PieceMoveCalculator{
         for (int[] direction : directions) {
             ChessPosition endPosition = new ChessPosition(startPosition.getRow()
                     + (direction[0]), startPosition.getColumn() + (direction[1]));
-            if (!endPosition.isOnBoard()) continue;
+            if (!endPosition.isOnBoard()) {
+                continue;
+            }
             ChessPiece pieceAtEnd = squares.getPiece(endPosition);
             if (pieceAtEnd != null) {
                 if (pieceAtEnd.getTeamColor() != teamColor) {
