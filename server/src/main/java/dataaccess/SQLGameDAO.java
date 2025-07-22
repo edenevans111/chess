@@ -2,8 +2,11 @@ package dataaccess;
 
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+
+import static java.sql.Types.NULL;
 
 public class SQLGameDAO implements GameDAO{
 
@@ -21,9 +24,11 @@ public class SQLGameDAO implements GameDAO{
 
     }
 
+    // I might need to change this so that it just takes in the gameData object instead of all the random stuff...
     @Override
     public int createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
-        return 0;
+        var statement = "INSERT INTO gameData (gameID, whiteUsername, blackUsername, gameName,) VALUES (?, ?, ?)";
+        executeUpdate(statement, gameName, whiteUsername, blackUsername);
     }
 
     @Override
@@ -63,6 +68,28 @@ public class SQLGameDAO implements GameDAO{
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("unable to configure database: %s", e.getMessage()));
+        }
+    }
+
+    private void executeUpdate(String statement, Object... parameters) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var ps = conn.prepareStatement(statement);
+            for (var i = 0; i < parameters.length; i++) {
+                Object param = parameters[i];
+                if (param == null){
+                    ps.setNull(i + 1, NULL);
+                } else if (param instanceof String p) {
+                    ps.setString(i + 1, p);
+                }
+                else if (param instanceof Integer p) {
+                    ps.setInt(i + 1, p);
+                } else {
+                    throw new DataAccessException("Wrong type entered: " + param.getClass());
+                }
+            }
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException( String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 

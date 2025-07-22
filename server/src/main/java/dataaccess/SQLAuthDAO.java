@@ -1,6 +1,5 @@
 package dataaccess;
 
-import com.google.gson.Gson;
 import model.AuthData;
 
 import java.sql.ResultSet;
@@ -30,12 +29,11 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
         var statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
-        var id = executeUpdate(statement, authData.authToken(), authData.username());
+        executeUpdate(statement, authData.authToken(), authData.username());
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        // this is a problem for some reason that I can't quite figure out
         try (var conn = DatabaseManager.getConnection()) {
             String statement = "SELECT * FROM authData WHERE authToken=?";
             try(var ps = conn.prepareStatement(statement)) {
@@ -59,25 +57,23 @@ public class SQLAuthDAO implements AuthDAO{
         executeUpdate(statement, authToken);
     }
 
-    private int executeUpdate(String statement, Object... parameters) throws DataAccessException {
+    private void executeUpdate(String statement, Object... parameters) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < parameters.length; i++) {
-                    var param = parameters[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof AuthDAO p) ps.setString(i + 1, p.toString());
-                    else if (param == null) ps.setNull(i + 1, NULL);
+            var ps = conn.prepareStatement(statement);
+            for (var i = 0; i < parameters.length; i++) {
+                Object param = parameters[i];
+                if (param == null){
+                    ps.setNull(i + 1, NULL);
+                } else if (param instanceof String p) {
+                    ps.setString(i + 1, p);
                 }
-                ps.executeUpdate();
-
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
+                else if (param instanceof Integer p) {
+                    ps.setInt(i + 1, p);
+                } else {
+                    throw new DataAccessException("Wrong type entered: " + param.getClass());
                 }
-
-                return 0;
             }
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException( String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
