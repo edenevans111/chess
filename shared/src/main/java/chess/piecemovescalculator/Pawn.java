@@ -64,15 +64,13 @@ public class Pawn implements PieceMoveCalculator {
                         + (direction[0]), startPosition.getColumn() + (direction[1]));
                 if (!endPosition.isOnBoard()) continue;
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-                if (pieceAtEnd != null) {
-                    if (pieceAtEnd.getTeamColor() != teamColor) {
-                        if (endPosition.getRow() == 8) {
-                            for (ChessPiece.PieceType type : promotionTypes) {
-                                moves.add(new ChessMove(startPosition, endPosition, type));
-                            }
-                        } else{
-                            moves.add(new ChessMove(startPosition, endPosition));
+                if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
+                    if (endPosition.getRow() == atEnd) {
+                        for (ChessPiece.PieceType type : promotionTypes) {
+                            moves.add(new ChessMove(startPosition, endPosition, type));
                         }
+                    } else{
+                        moves.add(new ChessMove(startPosition, endPosition));
                     }
                 }
             }
@@ -110,15 +108,13 @@ public class Pawn implements PieceMoveCalculator {
                         + (direction[0]), startPosition.getColumn() + (direction[1]));
                 if (!endPosition.isOnBoard()) continue;
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
-                if (pieceAtEnd != null) {
-                    if (pieceAtEnd.getTeamColor() != teamColor) {
-                        if (endPosition.getRow() == 1) {
-                            for (ChessPiece.PieceType type : promotionTypes) {
-                                moves.add(new ChessMove(startPosition, endPosition, type));
-                            }
-                        } else{
-                            moves.add(new ChessMove(startPosition, endPosition));
+                if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
+                    if (endPosition.getRow() == atEnd) {
+                        for (ChessPiece.PieceType type : promotionTypes) {
+                            moves.add(new ChessMove(startPosition, endPosition, type));
                         }
+                    } else{
+                        moves.add(new ChessMove(startPosition, endPosition));
                     }
                 }
             }
