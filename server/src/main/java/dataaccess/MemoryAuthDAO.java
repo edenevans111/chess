@@ -14,10 +14,6 @@ public class MemoryAuthDAO implements AuthDAO{
         this.authDataSet = new HashSet<>();
     }
 
-    public static String generateToken(){
-        return UUID.randomUUID().toString();
-    }
-
     @Override
     public void clear() throws DataAccessException {
         authDataSet.clear();
