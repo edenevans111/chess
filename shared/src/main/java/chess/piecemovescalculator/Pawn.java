@@ -78,7 +78,7 @@ public class Pawn implements PieceMoveCalculator {
                 if (!endPosition.isOnBoard()) continue;
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
                 if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
-                    if (endPosition.getRow() == atEnd) {
+                    if (endPosition.getRow() == 8) {
                         for (ChessPiece.PieceType type : promotionTypes) {
                             moves.add(new ChessMove(startPosition, endPosition, type));
                         }
@@ -107,7 +107,7 @@ public class Pawn implements PieceMoveCalculator {
                 if (!endPosition.isOnBoard()) continue;
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
                 if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
-                    if (endPosition.getRow() == atEnd) {
+                    if (endPosition.getRow() == 1) {
                         for (ChessPiece.PieceType type : promotionTypes) {
                             moves.add(new ChessMove(startPosition, endPosition, type));
                         }
@@ -117,7 +117,6 @@ public class Pawn implements PieceMoveCalculator {
                 }
             }
         }
-
         return moves;
     }
 }
