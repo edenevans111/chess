@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class Pawn implements PieceMoveCalculator {
 
-    Collection<ChessMove> pawnMoves(int[][] directions, ChessBoard squares, ChessPosition startPosition, int atEnd){
+    Collection<ChessMove> startPawnMoves(int[][] directions, ChessBoard squares, ChessPosition startPosition){
         Collection<ChessMove> moves = new ArrayList<>();
         for (int[] direction : directions) {
             ChessPosition endPosition = new ChessPosition(startPosition.getRow()
@@ -36,7 +36,7 @@ public class Pawn implements PieceMoveCalculator {
             int atEnd = 8;
             if (startPosition.getRow() == 2) {
                 int[][] directions = {{1, 0}, {2, 0}};
-                moves = pawnMoves(directions, squares, startPosition, atEnd);
+                moves = startPawnMoves(directions, squares, startPosition);
             }
             else {
                 int[][] directions = {{1, 0}};
@@ -80,7 +80,7 @@ public class Pawn implements PieceMoveCalculator {
             int atEnd = 1;
             if (startPosition.getRow() == 7) {
                 int[][] directions = {{-1, 0}, {-2, 0}};
-                moves = pawnMoves(directions, squares, startPosition, atEnd); // end of the for loop
+                moves = startPawnMoves(directions, squares, startPosition); // end of the for loop
             } // end of the row == 2 statement
             if (startPosition.getRow() != 7) {
                 int[][] directions = {{-1, 0}};
@@ -99,7 +99,7 @@ public class Pawn implements PieceMoveCalculator {
                     } else {
                         moves.add(new ChessMove(startPosition, endPosition));
                     }
-                } // end of the for loop
+                }
             } // end of the row != 2 statement
 
             int[][] directions = {{-1, 1}, {-1, -1}};
