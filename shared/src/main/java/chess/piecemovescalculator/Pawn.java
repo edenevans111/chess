@@ -12,7 +12,9 @@ public class Pawn implements PieceMoveCalculator {
         for (int[] direction : directions) {
             ChessPosition endPosition = new ChessPosition(startPosition.getRow()
                     + (direction[0]), startPosition.getColumn() + direction[1]);
-            if (!endPosition.isOnBoard()) continue;
+            if (!endPosition.isOnBoard()) {
+                continue;
+            }
             ChessPiece pieceAtEnd = squares.getPiece(endPosition);
             if (pieceAtEnd != null) {
                 break;
@@ -33,7 +35,9 @@ public class Pawn implements PieceMoveCalculator {
         for (int[] direction : directions) {
             ChessPosition endPosition = new ChessPosition(startPosition.getRow()
                     + direction[0], startPosition.getColumn());
-            if (!endPosition.isOnBoard()) break;
+            if (!endPosition.isOnBoard()) {
+                break;
+            }
             ChessPiece pieceAtEnd = squares.getPiece(endPosition);
             if (pieceAtEnd != null) {
                 continue;
@@ -75,7 +79,9 @@ public class Pawn implements PieceMoveCalculator {
             for (int[] direction : directions) {
                 ChessPosition endPosition = new ChessPosition(startPosition.getRow()
                         + (direction[0]), startPosition.getColumn() + (direction[1]));
-                if (!endPosition.isOnBoard()) continue;
+                if (!endPosition.isOnBoard()) {
+                    continue;
+                }
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
                 if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
                     if (endPosition.getRow() == 8) {
@@ -104,7 +110,9 @@ public class Pawn implements PieceMoveCalculator {
             for (int[] direction : directions) {
                 ChessPosition endPosition = new ChessPosition(startPosition.getRow()
                         + (direction[0]), startPosition.getColumn() + (direction[1]));
-                if (!endPosition.isOnBoard()) continue;
+                if (!endPosition.isOnBoard()) {
+                    continue;
+                }
                 ChessPiece pieceAtEnd = squares.getPiece(endPosition);
                 if (pieceAtEnd != null && pieceAtEnd.getTeamColor() != teamColor) {
                     if (endPosition.getRow() == 1) {
