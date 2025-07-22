@@ -1,5 +1,6 @@
 package dataaccess;
 
+import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
@@ -13,7 +14,22 @@ public class DatabaseManager {
      * Load the database information for the db.properties file.
      */
     static {
-        loadPropertiesFromResources();
+        try {
+            try (InputStream in = DatabaseManager.class.getClassLoader().getResourceAsStream("db.properties")){
+                Properties props = new Properties();
+                props.load(in);
+                // this one might need to be changed for my specific database
+                databaseName = props.getProperty("db.name");
+                dbUsername = props.getProperty("db.user");
+                dbPassword = props.getProperty("db.password");
+
+                var host = props.getProperty(("db.host"));
+                var port = Integer.parseInt(props.getProperty("db.port"));
+                connectionUrl = String.format("jdbc:mysql://%:%d", host, port);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("unable to process db.properties" + e.getMessage());
+        }
     }
 
     /**
