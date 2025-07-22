@@ -7,13 +7,11 @@ import java.util.Collection;
 
 public class Pawn implements PieceMoveCalculator {
 
-    Collection<ChessMove> pawnMoves(int[][] directions, ChessBoard squares, ChessPosition startPosition){
+    Collection<ChessMove> pawnMoves(int[][] directions, ChessBoard squares, ChessPosition startPosition, int atEnd){
         Collection<ChessMove> moves = new ArrayList<>();
-
         for (int[] direction : directions) {
-            // I need to make sure the piece does not move if there is something in front of it
             ChessPosition endPosition = new ChessPosition(startPosition.getRow()
-                    + (direction[0]), startPosition.getColumn());
+                    + (direction[0]), startPosition.getColumn() + direction[1]);
             if (!endPosition.isOnBoard()) continue;
             ChessPiece pieceAtEnd = squares.getPiece(endPosition);
             if (pieceAtEnd != null) {
@@ -21,10 +19,8 @@ public class Pawn implements PieceMoveCalculator {
             }
             moves.add(new ChessMove(startPosition, endPosition));
         }
-
         return moves;
     }
-
 
     @Override
     public Collection<ChessMove> move(ChessBoard squares, ChessPosition startPosition) {
@@ -37,10 +33,11 @@ public class Pawn implements PieceMoveCalculator {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessGame.TeamColor teamColor = squares.getPiece(startPosition).getTeamColor();
         if (teamColor == ChessGame.TeamColor.WHITE) {
+            int atEnd = 8;
             if (startPosition.getRow() == 2) {
                 int[][] directions = {{1, 0}, {2, 0}};
-                moves = pawnMoves(directions, squares, startPosition); // end of the for loop
-            } // end of the row == 2 statement
+                moves = pawnMoves(directions, squares, startPosition, atEnd);
+            }
             else {
                 int[][] directions = {{1, 0}};
                 for (int[] direction : directions) {
@@ -82,9 +79,10 @@ public class Pawn implements PieceMoveCalculator {
         }
         // this is for the Black pawns
         if (teamColor == ChessGame.TeamColor.BLACK) {
+            int atEnd = 1;
             if (startPosition.getRow() == 7) {
                 int[][] directions = {{-1, 0}, {-2, 0}};
-                moves = pawnMoves(directions, squares, startPosition); // end of the for loop
+                moves = pawnMoves(directions, squares, startPosition, atEnd); // end of the for loop
             } // end of the row == 2 statement
             if (startPosition.getRow() != 7) {
                 int[][] directions = {{-1, 0}};
