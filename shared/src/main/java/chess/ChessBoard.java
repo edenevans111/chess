@@ -84,12 +84,10 @@ public class ChessBoard {
     public ChessPosition kingPosition(ChessGame.TeamColor teamColor){
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                if(getPiece(new ChessPosition(i, j)) != null){
-                    if(getPiece(new ChessPosition(i , j)).getPieceType() == ChessPiece.PieceType.KING){
-                        if(getPiece(new ChessPosition(i , j)).getTeamColor() == teamColor){
-                            return new ChessPosition(i , j);
-                        }
-                    }
+                if(getPiece(new ChessPosition(i, j)) != null &&
+                        getPiece(new ChessPosition(i , j)).getPieceType() == ChessPiece.PieceType.KING &&
+                        getPiece(new ChessPosition(i , j)).getTeamColor() == teamColor){
+                    return new ChessPosition(i , j);
                 }
             }
         }
@@ -100,10 +98,9 @@ public class ChessBoard {
         Collection<ChessPosition> positions = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                if(getPiece(new ChessPosition(i, j)) != null){
-                    if(getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor){
-                        positions.add(new ChessPosition(i, j));
-                    }
+                if(getPiece(new ChessPosition(i, j)) != null &&
+                        getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor){
+                    positions.add(new ChessPosition(i, j));
                 }
             }
         }
