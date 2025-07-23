@@ -22,7 +22,7 @@ public class SQLGameDAO implements GameDAO{
         try {
             configureDatabase();
         } catch (DataAccessException e) {
-            System.out.println("SQLAuthDAO failed to make database");
+            System.out.println("Error: SQLAuthDAO failed to make database");
         }
 
     }
@@ -91,7 +91,7 @@ public class SQLGameDAO implements GameDAO{
                games.add(readGame(rs));
            }
        } catch (SQLException e) {
-           throw new DataAccessException(e.getMessage());
+           throw new DataAccessException("Error: "+e.getMessage());
        }
         return games;
     }
@@ -114,7 +114,7 @@ public class SQLGameDAO implements GameDAO{
                 throw new DataAccessException("Error: game not found");
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: bad request" + e.getMessage());
+            throw new DataAccessException("Error: " + e.getMessage());
         }
     }
 
@@ -138,7 +138,7 @@ public class SQLGameDAO implements GameDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Error: unable to configure Game database: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Error: " + e.getMessage()));
         }
     }
 

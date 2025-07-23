@@ -44,7 +44,7 @@ public class SQLUserDAO implements UserDAO{
             }
             throw new DataAccessException("Error: unauthorized");
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("Error: unauthorized");
         }
     }
 
