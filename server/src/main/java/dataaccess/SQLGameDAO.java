@@ -1,8 +1,13 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.GameData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +15,8 @@ import java.util.List;
 import static java.sql.Types.NULL;
 
 public class SQLGameDAO implements GameDAO{
+
+    private final Gson gson = new Gson();
 
     public SQLGameDAO() {
         try {
@@ -30,37 +37,94 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public int createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
         String statement = "INSERT INTO gameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        executeUpdate(statement, gameName, whiteUsername, blackUsername);
-        // this needs to be fixed somehow...
-        return 0;
+        ChessGame game = new ChessGame();
+        String gameJson = gson.toJson(game);
+
+        try(var conn = DatabaseManager.getConnection()){
+            var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);{
+                ps.setString(1, whiteUsername);
+                ps.setString(2, blackUsername);
+                ps.setString(3, gameName);
+                ps.setString(4, gameJson);
+
+                ps.executeUpdate();
+                try (ResultSet rs = ps.getGeneratedKeys()){
+                    if(rs.next()){
+                        return rs.getInt(1);
+                    } else {
+                        throw new DataAccessException("Did not get generated gameID");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to create the game "+ e.getMessage());
+        }
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        return null;
+        String statement = "SELECT * FROM gameData WHERE gameID=?";
+        try(var conn = DatabaseManager.getConnection()){
+            var ps = conn.prepareStatement(statement);{
+                ps.setInt(1, gameID);
+                try (ResultSet rs = ps.executeQuery()){
+                    if (rs.next()){
+                        return readGame(rs);
+                    } else {
+                        throw new DataAccessException("Error: bad request");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-       Collection<GameData> games = new HashSet<GameData>();
-       // I need to make it so that this function will return a Collection of everything in the table
+       String statement = "SELECT * FROM gameData";
+       Collection<GameData> games = new ArrayList<>();
+       try (var conn = DatabaseManager.getConnection()){
+           var ps = conn.prepareStatement(statement);
+           var rs = ps.executeQuery();
+           while(rs.next()){
+               games.add(readGame(rs));
+           }
+       } catch (SQLException e) {
+           throw new RuntimeException(e);
+       }
         return games;
     }
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
+        String statement = "UPDATE gameData SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
 
+        try (var conn = DatabaseManager.getConnection()){
+            String gameJson = gson.toJson(gameData.game());
+            var ps = conn.prepareStatement(statement);
+            ps.setString(1, gameData.whiteUsername());
+            ps.setString(2, gameData.blackUsername());
+            ps.setString(3, gameData.gameName());
+            ps.setString(4, gameJson);
+            ps.setInt(5, gameData.gameID());
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected <= 0){
+                throw new DataAccessException("Error: game not found");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: bad request" + e.getMessage());
+        }
     }
 
     private final String[] createStatements = {
             """
            CREATE TABLE IF NOT EXISTS gameData (
-            gameID int NOT NULL,
+            gameID int NOT NULL AUTO:INCREMENT PRIMARY KEY,
             whiteUsername VARCHAR(255),
             blackUsername VARCHAR(255),
             gameName VARCHAR(255) NOT NULL,
-            chessGame TEXT NOT NULL,
-            PRIMARY KEY (gameID)
+            chessGame TEXT NOT NULL
             )"""
     };
 
@@ -97,6 +161,16 @@ public class SQLGameDAO implements GameDAO{
         } catch (SQLException e) {
             throw new DataAccessException( String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
+    }
+
+    private GameData readGame(ResultSet rs) throws SQLException{
+        int gameID = rs.getInt("gameID");
+        String whiteUsername = rs.getString("whiteUsername");
+        String blackUsername = rs.getString("blackUsername");
+        String gameName = rs.getString("gameName");
+        String gameJson = rs.getString("game");
+        ChessGame gameObj = gson.fromJson(gameJson, ChessGame.class);
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, gameObj);
     }
 
 }
