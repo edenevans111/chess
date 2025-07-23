@@ -36,7 +36,7 @@ public class SQLGameDAO implements GameDAO{
     // I might need to change this so that it just takes in the gameData object instead of all the random stuff...
     @Override
     public int createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
-        String statement = "INSERT INTO gameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+        String statement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
         ChessGame game = new ChessGame();
         String gameJson = gson.toJson(game);
 
@@ -120,7 +120,7 @@ public class SQLGameDAO implements GameDAO{
     private final String[] createStatements = {
             """
            CREATE TABLE IF NOT EXISTS gameData (
-            gameID int NOT NULL AUTO:INCREMENT PRIMARY KEY,
+            gameID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
             whiteUsername VARCHAR(255),
             blackUsername VARCHAR(255),
             gameName VARCHAR(255) NOT NULL,
