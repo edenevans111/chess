@@ -50,7 +50,7 @@ public class SQLAuthDAOTest {
 
     @Test
     void getAuthNegative() throws DataAccessException {
-        // try to get an authToken that does not exist
+        assertNull(authDAO.getAuth("FakeAuth"));
     }
 
     // positive and negative test for deleteAuth
@@ -65,7 +65,6 @@ public class SQLAuthDAOTest {
 
     @Test
     void deleteAuthNegative() throws DataAccessException {
-        // try to delete an authData that does not exist
         assertThrows(DataAccessException.class, ()->
                 authDAO.deleteAuth("FakeAuth"));
     }
