@@ -73,7 +73,7 @@ public class SQLUserDAO implements UserDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Error: unable to configure database: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Error: unable to configure User database: %s", e.getMessage()));
         }
     }
 
@@ -96,7 +96,7 @@ public class SQLUserDAO implements UserDAO{
             }
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException( String.format("Error: unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException( String.format("Error: unable to update User database: %s, %s", statement, e.getMessage()));
         }
     }
 }

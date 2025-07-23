@@ -79,7 +79,7 @@ public class SQLAuthDAO implements AuthDAO{
             }
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException( String.format("Error: unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException( String.format("Error: unable to update Auth database: %s, %s", statement, e.getMessage()));
         }
     }
 
@@ -101,7 +101,7 @@ public class SQLAuthDAO implements AuthDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Error: unable to configure database: %s", e.getMessage()));
+            throw new DataAccessException(String.format("unable to configure Auth database: %s", e.getMessage()));
         }
     }
 
