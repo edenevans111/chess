@@ -17,127 +17,104 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLGameDAOTest {
 
-    private static SQLGameDAO gameDAO;
+    SQLGameDAO gameDAO = new SQLGameDAO();
 
-    private final String[] createStatements = {
-            """
-           CREATE TABLE IF NOT EXISTS testGameData (
-            gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            whiteUsername VARCHAR(255),
-            blackUsername VARCHAR(255),
-            gameName VARCHAR(255) NOT NULL,
-            chessGame TEXT NOT NULL
-            )"""
-    };
+    @BeforeEach
+    void setUp() throws DataAccessException {
+        gameDAO.clear();
+    }
 
     private final Gson gson = new Gson();
 
-    @BeforeEach
+    UserData userData1 = new UserData("username1", "password1", "email1@email.com");
+    UserData userData2 = new UserData("username2", "password2", "email2@email.com");
 
-    /*void setUpGame() throws DataAccessException, SQLException {
-        // I need to createDatabase(in the DatabaseManager)
-        gameDAO.configureDatabase(createStatements);
-        // create a new chessGame and convert it to a Json
-        ChessGame game = new ChessGame();
-        String gameJson = gson.toJson(game);
-        // create a gameData with random information (make sure everything GameData needs is there
-        GameData gameData = new GameData(1, "whiteUsername", "blackUsername",
-                "BestChessGame", game);
 
-        // get a connection
-        try(var conn = DatabaseManager.getConnection()){
-            // if the table already exists, delete it
-            try {
-                var cleanSlate = conn.prepareStatement("DROP TABLE IF EXISTS testGameData");
-                cleanSlate.executeUpdate();
-            } catch (SQLException e){
-                throw new DataAccessException(e.getMessage());
-            }
-            try (var connection = DatabaseManager.getConnection()){
-                for(var statement : createStatements) {
-                    try (var preparedStatement = connection.prepareStatement(statement)){
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            } catch (Exception e) {
-                throw new DataAccessException(String.format("Error: unable to configure User database: %s", e.getMessage()));
-            }
-        }
 
-        String statement = "INSERT INTO testGameData (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
+    //@BeforeEach
+    // I might just need to delete everything before each of the tests to make sure that
+    // they each have a blank slate
+    // maybe I need to also have some userData...
 
-        try(var conn = DatabaseManager.getConnection();
-            var ps = conn.prepareStatement(statement,
-                    new String[]{"gameID"})){
-            ps.setString(1, gameData.whiteUsername());
-            ps.setString(2, gameData.blackUsername());
-            ps.setString(3, gameData.gameName());
-            ps.setString(4, gameJson);
 
-            ps.executeUpdate();
-            try (ResultSet rs = ps.getGeneratedKeys()){
-                if(rs.next()){
-                    rs.getInt(1);
-                } else {
-                    throw new DataAccessException("Error: Did not get generated gameID");
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException("Error: unable to create game " + ex.getMessage());
-        }
-
-    }*/
 
     @Test
     void clearPositive() throws DataAccessException{
-        // create new SQLGameDAO object
-        SQLGameDAO gameDAO1 = new SQLGameDAO();
-        gameDAO1.clear();
-        // clear it
-        assertTrue(gameDAO1.isEmpty("testGameData"));
+        gameDAO.createGame("whiteUsername", "blackUsername", "BestGameEver");
+        gameDAO.clear();
+        assertTrue(gameDAO.isEmpty());
     }
 
     // positive and negative tests for listGames
     @Test
-    void listGamesPositive(){
+    void listGamesPositive() throws DataAccessException {
+        gameDAO.createGame("username1", "username2", "Game1");
+        gameDAO.createGame("username3", "username4", "Game2");
+        Collection<GameData> games = gameDAO.listGames();
+        assertNotNull(games);
+        // need to make sure that in the table,
 
     }
 
     @Test
-    void listGamesNegative(){
-
+    void listGamesNegative() throws DataAccessException {
+        Collection<GameData> games = gameDAO.listGames();
+        assertNotNull(games);
     }
 
     // positive and negative tests for createGame
     @Test
-    void createGamePositive(){
-
+    void createGamePositive() throws DataAccessException {
+        int gameID = gameDAO.createGame("whiteUser", "blackUser", "BestestGame");
+        assertTrue(gameID > 0);
+        GameData gameData = gameDAO.getGame(gameID);
+        assertEquals("whiteUser", gameData.whiteUsername());
+        assertNotNull(gameData.game());
     }
 
     @Test
-    void createGameNegative(){
-
+    void createGameNegative() throws DataAccessException {
+        assertThrows(DataAccessException.class, () -> {
+            gameDAO.createGame("whiteUser", "blackUser", null);
+        });
     }
 
     // positive and negative tests for getGame
     @Test
-    void getGamePositive(){
-
+    void getGamePositive() throws DataAccessException {
+        int gameID = gameDAO.createGame("whiteUsername", "blackUsername", "JustAnotherGame");
+        GameData gameData = gameDAO.getGame(gameID);
+        assertNotNull(gameData);
     }
 
     @Test
-    void getGameNegative(){
-
+    void getGameNegative() throws DataAccessException {
+        int gameID = gameDAO.createGame("whiteUsername", "blackUsername", "JustAnotherGame");
+        assertThrows(DataAccessException.class, () ->{
+            gameDAO.getGame(2);
+        });
     }
 
     // positive and negative for updateGame
     @Test
-    void updateGamePositive(){
+    void updateGamePositive() throws DataAccessException {
+        int gameID = gameDAO.createGame("whiteUsername", "blackUsername", "JustAnotherGame");
+        GameData gameData = gameDAO.getGame(gameID);
 
+        GameData updated = new GameData(gameData.gameID(), "newWhite", "blackUsername",
+                "JustAnotherGame", gameData.game());
+        gameDAO.updateGame(updated);
+
+        GameData updatedGame = gameDAO.getGame(gameID);
+        assertEquals("newWhite", updatedGame.whiteUsername());
     }
 
     @Test
-    void updateGameNegative(){
-
+    void updateGameNegative() throws DataAccessException {
+        ChessGame game = new ChessGame();
+        GameData fakeNews = new GameData(5, "whiteUSer", "blackUser", "ErrorGame", game);
+        assertThrows(DataAccessException.class, () ->{
+            gameDAO.updateGame(fakeNews);
+        });
     }
 }

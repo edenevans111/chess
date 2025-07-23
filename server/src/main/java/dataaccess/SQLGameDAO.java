@@ -138,6 +138,6 @@ public class SQLGameDAO extends SQLDatabase implements GameDAO{
     }
 
     public boolean isEmpty() throws DataAccessException{
-        return true;
+        return listGames().isEmpty();
     }
 }
