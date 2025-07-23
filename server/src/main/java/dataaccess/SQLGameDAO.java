@@ -40,8 +40,9 @@ public class SQLGameDAO implements GameDAO{
         ChessGame game = new ChessGame();
         String gameJson = gson.toJson(game);
 
-        try(var conn = DatabaseManager.getConnection()){
-            var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);{
+        try(var conn = DatabaseManager.getConnection();
+                var ps = conn.prepareStatement(statement,
+                        Statement.RETURN_GENERATED_KEYS)){
                 ps.setString(1, whiteUsername);
                 ps.setString(2, blackUsername);
                 ps.setString(3, gameName);
@@ -55,9 +56,8 @@ public class SQLGameDAO implements GameDAO{
                         throw new DataAccessException("Did not get generated gameID");
                     }
                 }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to create the game "+ e.getMessage());
+            } catch (SQLException ex) {
+                throw new DataAccessException("Error: unable to create game " + ex.getMessage());
         }
     }
 
