@@ -1,7 +1,11 @@
-package dataaccess;
+package service;
 
 import chess.ChessGame;
 import chess.InvalidMoveException;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -13,7 +17,6 @@ import request.ListRequest;
 import response.CreateResponse;
 import response.JoinResponse;
 import response.ListResponse;
-import service.GameService;
 
 import java.util.ArrayList;
 import java.util.Collection;
