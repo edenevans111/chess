@@ -10,6 +10,7 @@ import static java.sql.Types.NULL;
 
 public class SQLAuthDAO extends SQLDatabase implements AuthDAO{
 
+    private final String tableName = "authData";
 
     public SQLAuthDAO() {
         try {

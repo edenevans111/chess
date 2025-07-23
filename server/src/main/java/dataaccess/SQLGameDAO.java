@@ -14,6 +14,7 @@ import static java.sql.Types.NULL;
 public class SQLGameDAO extends SQLDatabase implements GameDAO{
 
     private final Gson gson = new Gson();
+    private final String tableName = "gameData";
 
     public SQLGameDAO() {
         try {

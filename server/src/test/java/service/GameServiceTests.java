@@ -29,7 +29,7 @@ class GameServiceTests {
     private GameService gameService;
 
     @BeforeEach
-    void makeGame() throws InvalidMoveException, DataAccessException{
+    void makeGame() throws DataAccessException{
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();

@@ -16,5 +16,5 @@ public class SQLUserDAOTest {
     // positive and negative test for create
 
     // positive and negative test for get
-    
+
 }

@@ -6,6 +6,7 @@ import static java.sql.Types.NULL;
 
 public class SQLDatabase {
 
+
     void executeUpdate(String statement, Object... parameters) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var ps = conn.prepareStatement(statement);
@@ -39,6 +40,21 @@ public class SQLDatabase {
         } catch (Exception e) {
             throw new DataAccessException(String.format("Error: unable to configure User database: %s", e.getMessage()));
         }
+    }
+
+    public boolean isEmpty(String tableName) throws DataAccessException{
+        String statement = "SELECT COUNT(*) FROM " + tableName;
+        try (var conn = DatabaseManager.getConnection()){
+            var ps = conn.prepareStatement(statement);
+            var rs = ps.executeQuery();
+            if (rs.next()){
+                int count = rs.getInt(1);
+                return count == 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+        return false;
     }
 
 }

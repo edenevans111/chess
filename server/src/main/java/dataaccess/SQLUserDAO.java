@@ -9,6 +9,8 @@ import static java.sql.Types.NULL;
 
 public class SQLUserDAO extends SQLDatabase implements UserDAO{
 
+    private final String tableName = "userData";
+
     public SQLUserDAO() {
         try {
             configureDatabase(createStatements);
@@ -26,7 +28,6 @@ public class SQLUserDAO extends SQLDatabase implements UserDAO{
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         var statement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
-        // I think here I need to encrypt the password so that it is better protected...
         String encryptedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         executeUpdate(statement, userData.username(), encryptedPassword, userData.email());
     }
@@ -63,8 +64,4 @@ public class SQLUserDAO extends SQLDatabase implements UserDAO{
             email VARCHAR(255) NOT NULL
             )"""
     };
-
-    public boolean isEmpty() throws DataAccessException{
-        return true;
-    }
 }
