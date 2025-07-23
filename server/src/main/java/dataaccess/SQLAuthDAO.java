@@ -53,6 +53,10 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
+        AuthData authData = getAuth(authToken);
+        if(authData == null){
+            throw new DataAccessException("Error: unauthorized");
+        }
         var statement = "DELETE FROM authData WHERE authToken=?";
         executeUpdate(statement, authToken);
     }

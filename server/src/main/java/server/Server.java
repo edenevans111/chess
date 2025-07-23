@@ -16,9 +16,9 @@ public class Server {
 
 
     public Server() {
-        this.userDAO = new MemoryUserDAO();
+        this.userDAO = new SQLUserDAO();
         this.authDAO = new SQLAuthDAO();
-        this.gameDAO = new MemoryGameDAO();
+        this.gameDAO = new SQLGameDAO();
     }
 
     public int run(int desiredPort) {

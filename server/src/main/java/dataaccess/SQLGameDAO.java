@@ -4,6 +4,7 @@ import model.GameData;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import static java.sql.Types.NULL;
@@ -21,14 +22,17 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void clear() throws DataAccessException {
-
+        String statement = "TRUNCATE TABLE gameData";
+        executeUpdate(statement);
     }
 
     // I might need to change this so that it just takes in the gameData object instead of all the random stuff...
     @Override
     public int createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
-        var statement = "INSERT INTO gameData (gameID, whiteUsername, blackUsername, gameName,) VALUES (?, ?, ?)";
+        String statement = "INSERT INTO gameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
         executeUpdate(statement, gameName, whiteUsername, blackUsername);
+        // this needs to be fixed somehow...
+        return 0;
     }
 
     @Override
@@ -38,7 +42,9 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        return List.of();
+       Collection<GameData> games = new HashSet<GameData>();
+       // I need to make it so that this function will return a Collection of everything in the table
+        return games;
     }
 
     @Override
