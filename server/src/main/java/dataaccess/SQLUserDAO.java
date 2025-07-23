@@ -64,4 +64,8 @@ public class SQLUserDAO extends SQLDatabase implements UserDAO{
             email VARCHAR(255) NOT NULL
             )"""
     };
+
+    public boolean isEmpty() throws DataAccessException {
+        return true;
+    }
 }
