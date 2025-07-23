@@ -7,13 +7,13 @@ import java.sql.*;
 
 import static java.sql.Types.NULL;
 
-public class SQLUserDAO implements UserDAO{
+public class SQLUserDAO extends SQLDatabase implements UserDAO{
 
     public SQLUserDAO() {
         try {
-            configureDatabase();
+            configureDatabase(createStatements);
         } catch (DataAccessException e) {
-            System.out.println("SQLAuthDAO failed to make database");
+            System.out.println("SQLUserDAO failed to make database");
         }
     }
 
@@ -64,39 +64,7 @@ public class SQLUserDAO implements UserDAO{
             )"""
     };
 
-    private void configureDatabase() throws DataAccessException{
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()){
-            for(var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)){
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("Error: unable to configure User database: %s", e.getMessage()));
-        }
-    }
-
-    // I think I will need to find a better way to manage this function later on...
-    private void executeUpdate(String statement, Object... parameters) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            var ps = conn.prepareStatement(statement);
-            for (int i = 0; i < parameters.length; i++) {
-                Object param = parameters[i];
-                if (param == null){
-                    ps.setNull(i + 1, NULL);
-                } else if (param instanceof String p) {
-                    ps.setString(i + 1, p);
-                }
-                else if (param instanceof Integer p) {
-                    ps.setInt(i + 1, p);
-                } else {
-                    throw new DataAccessException("Error: Wrong type entered: " + param.getClass());
-                }
-            }
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataAccessException( String.format("Error: unable to update User database: %s, %s", statement, e.getMessage()));
-        }
+    public boolean isEmpty() throws DataAccessException{
+        return true;
     }
 }

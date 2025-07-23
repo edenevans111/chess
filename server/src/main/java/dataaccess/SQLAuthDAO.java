@@ -8,12 +8,12 @@ import java.sql.SQLException;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class SQLAuthDAO implements AuthDAO{
+public class SQLAuthDAO extends SQLDatabase implements AuthDAO{
 
 
     public SQLAuthDAO() {
         try {
-            configureDatabase();
+            configureDatabase(createStatements);
         } catch (DataAccessException e) {
             System.out.println("SQLAuthDAO failed to make database");
         }
@@ -61,28 +61,6 @@ public class SQLAuthDAO implements AuthDAO{
         executeUpdate(statement, authToken);
     }
 
-    private void executeUpdate(String statement, Object... parameters) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            var ps = conn.prepareStatement(statement);
-            for (var i = 0; i < parameters.length; i++) {
-                Object param = parameters[i];
-                if (param == null){
-                    ps.setNull(i + 1, NULL);
-                } else if (param instanceof String p) {
-                    ps.setString(i + 1, p);
-                }
-                else if (param instanceof Integer p) {
-                    ps.setInt(i + 1, p);
-                } else {
-                    throw new DataAccessException("Error: Wrong type entered: " + param.getClass());
-                }
-            }
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataAccessException( String.format("Error: unable to update Auth database: %s, %s", statement, e.getMessage()));
-        }
-    }
-
     private final String[] createStatements = {
             """
            CREATE TABLE IF NOT EXISTS authData (
@@ -92,22 +70,13 @@ public class SQLAuthDAO implements AuthDAO{
             )"""
     };
 
-    private void configureDatabase() throws DataAccessException{
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()){
-            for(var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)){
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("unable to configure Auth database: %s", e.getMessage()));
-        }
-    }
-
     private AuthData readAuth(ResultSet rs) throws SQLException {
         var authToken = rs.getString("authToken");
         var username = rs.getString("username");
         return new AuthData(authToken, username);
+    }
+
+    public boolean isEmpty() throws DataAccessException{
+        return true;
     }
 }

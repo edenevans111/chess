@@ -14,8 +14,6 @@ public class DatabaseManager {
      * Load the database information for the db.properties file.
      */
 
-    // this one I made myself, so I might need to fix a lot of things with it...
-    // it comes from the PetShop code though, so I think it's right
     static {
         try {
             try (InputStream in = DatabaseManager.class.getClassLoader().getResourceAsStream("db.properties")){

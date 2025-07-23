@@ -64,7 +64,7 @@ public class Server {
             else{
                 response.status(500);
             }
-            return String.format("{\"message\": \"Error: %s\"}", msg);
+            return String.format("{\"message\": \"%s\"}", msg);
         }
         response.status(200);
         return "{}";
@@ -131,13 +131,13 @@ public class Server {
             String msg = e.getMessage();
             if (msg.contains("Error: bad request")) {
                 response.status(400);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
+                return String.format("{\"message\": \"%s\"}", msg);
             } else if (msg.contains("Error: unauthorized")) {
                 response.status(401);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
+                return String.format("{\"message\": \"%s\"}", msg);
             } else {
                 response.status(500);
-                return String.format("{\"message\": \"Error: %s\"}", msg);
+                return String.format("{\"message\": \"%s\"}", msg);
             }
         }
     }
@@ -159,7 +159,7 @@ public class Server {
             } else {
                 response.status(500);
             }
-            return String.format("{\"message\": \"Error: %s\"}", msg);
+            return String.format("{\"message\": \"%s\"}", msg);
         }
     }
 
