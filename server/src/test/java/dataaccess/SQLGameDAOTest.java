@@ -24,19 +24,6 @@ public class SQLGameDAOTest {
         gameDAO.clear();
     }
 
-    private final Gson gson = new Gson();
-
-    UserData userData1 = new UserData("username1", "password1", "email1@email.com");
-    UserData userData2 = new UserData("username2", "password2", "email2@email.com");
-
-
-
-    //@BeforeEach
-    // I might just need to delete everything before each of the tests to make sure that
-    // they each have a blank slate
-    // maybe I need to also have some userData...
-
-
 
     @Test
     void clearPositive() throws DataAccessException{

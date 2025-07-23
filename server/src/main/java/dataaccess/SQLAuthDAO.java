@@ -79,4 +79,8 @@ public class SQLAuthDAO extends SQLDatabase implements AuthDAO{
         return new AuthData(authToken, username);
     }
 
+
+    public boolean isEmpty() throws DataAccessException {
+        return true;
+    }
 }

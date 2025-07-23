@@ -15,21 +15,7 @@ public class DatabaseManager {
      */
 
     static {
-        try {
-            try (InputStream in = DatabaseManager.class.getClassLoader().getResourceAsStream("db.properties")){
-                Properties props = new Properties();
-                props.load(in);
-                databaseName = props.getProperty("db.name");
-                dbUsername = props.getProperty("db.user");
-                dbPassword = props.getProperty("db.password");
-
-                var host = props.getProperty(("db.host"));
-                var port = Integer.parseInt(props.getProperty("db.port"));
-                connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error: unable to process db.properties" + e.getMessage());
-        }
+        loadPropertiesFromResources();
     }
 
     /**
