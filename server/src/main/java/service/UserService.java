@@ -70,7 +70,7 @@ public class UserService {
             AuthData authData = authDAO.getAuth(authToken);
             authDAO.deleteAuth(authToken);
         } catch(DataAccessException e){
-            throw new DataAccessException("Error: unauthorized");
+            throw new DataAccessException(e.getMessage());
         }
     }
 }

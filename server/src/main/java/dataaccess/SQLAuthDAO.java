@@ -16,7 +16,9 @@ public class SQLAuthDAO extends SQLDatabase implements AuthDAO{
         try {
             configureDatabase(createStatements);
         } catch (DataAccessException e) {
-            System.out.println("SQLAuthDAO failed to make database");
+            // maybe this needs to throw an error?
+            // but if I have it throw an error, then other problem pop up...
+            System.out.println("Error: failed to make database");
         }
 
     }
@@ -47,7 +49,7 @@ public class SQLAuthDAO extends SQLDatabase implements AuthDAO{
             }
 
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("Error: "+e.getMessage());
         }
         return null;
     }
@@ -77,7 +79,4 @@ public class SQLAuthDAO extends SQLDatabase implements AuthDAO{
         return new AuthData(authToken, username);
     }
 
-    public boolean isEmpty() throws DataAccessException{
-        return true;
-    }
 }

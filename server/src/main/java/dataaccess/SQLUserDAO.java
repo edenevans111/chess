@@ -15,7 +15,7 @@ public class SQLUserDAO extends SQLDatabase implements UserDAO{
         try {
             configureDatabase(createStatements);
         } catch (DataAccessException e) {
-            System.out.println("SQLUserDAO failed to make database");
+            System.out.println("Error: SQLUserDAO failed to make database");
         }
     }
 
@@ -45,7 +45,7 @@ public class SQLUserDAO extends SQLDatabase implements UserDAO{
             }
             throw new DataAccessException("Error: unauthorized");
         } catch (Exception e) {
-            throw new DataAccessException("Error: unauthorized");
+            throw new DataAccessException(e.getMessage());
         }
     }
 

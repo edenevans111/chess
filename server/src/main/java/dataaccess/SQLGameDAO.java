@@ -74,7 +74,7 @@ public class SQLGameDAO extends SQLDatabase implements GameDAO{
                     }
                 }
             } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -112,7 +112,7 @@ public class SQLGameDAO extends SQLDatabase implements GameDAO{
                 throw new DataAccessException("Error: game not found");
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
     }
 
