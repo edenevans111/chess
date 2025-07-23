@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 
@@ -25,7 +26,9 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         var statement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, userData.username(), userData.password(), userData.email());
+        // I think here I need to encrypt the password so that it is better protected...
+        String encryptedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
+        executeUpdate(statement, userData.username(), encryptedPassword, userData.email());
     }
 
     @Override
@@ -70,7 +73,7 @@ public class SQLUserDAO implements UserDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("unable to configure database: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Error: unable to configure database: %s", e.getMessage()));
         }
     }
 
@@ -88,12 +91,12 @@ public class SQLUserDAO implements UserDAO{
                 else if (param instanceof Integer p) {
                     ps.setInt(i + 1, p);
                 } else {
-                    throw new DataAccessException("Wrong type entered: " + param.getClass());
+                    throw new DataAccessException("Error: Wrong type entered: " + param.getClass());
                 }
             }
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException( String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException( String.format("Error: unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 }

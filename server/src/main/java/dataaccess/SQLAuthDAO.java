@@ -74,12 +74,12 @@ public class SQLAuthDAO implements AuthDAO{
                 else if (param instanceof Integer p) {
                     ps.setInt(i + 1, p);
                 } else {
-                    throw new DataAccessException("Wrong type entered: " + param.getClass());
+                    throw new DataAccessException("Error: Wrong type entered: " + param.getClass());
                 }
             }
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException( String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException( String.format("Error: unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
@@ -101,7 +101,7 @@ public class SQLAuthDAO implements AuthDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("unable to configure database: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Error: unable to configure database: %s", e.getMessage()));
         }
     }
 

@@ -53,7 +53,7 @@ public class SQLGameDAO implements GameDAO{
                 if(rs.next()){
                     return rs.getInt(1);
                 } else {
-                    throw new DataAccessException("Did not get generated gameID");
+                    throw new DataAccessException("Error: Did not get generated gameID");
                 }
             }
         } catch (SQLException ex) {
@@ -138,7 +138,7 @@ public class SQLGameDAO implements GameDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("unable to configure database: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Error: unable to configure database: %s", e.getMessage()));
         }
     }
 
@@ -155,12 +155,12 @@ public class SQLGameDAO implements GameDAO{
                 else if (param instanceof Integer p) {
                     ps.setInt(i + 1, p);
                 } else {
-                    throw new DataAccessException("Wrong type entered: " + param.getClass());
+                    throw new DataAccessException("Error: Wrong type entered: " + param.getClass());
                 }
             }
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException( String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException( String.format("Error: unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 

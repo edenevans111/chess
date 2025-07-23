@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import request.*;
 import response.*;
 
@@ -52,7 +53,9 @@ public class UserService {
             throw new DataAccessException("Error: bad request");
         }
         UserData userData = userDAO.getUser(username);
-        if (userData.password().equals(password)) {
+        // here I need to decrypt the password...
+        String hashedPassword = userData.password();
+        if (BCrypt.checkpw(password, hashedPassword)) {
             String authToken = UUID.randomUUID().toString();
             AuthData authdata = new AuthData(authToken, username);
             authDAO.createAuth(authdata);
