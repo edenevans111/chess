@@ -32,18 +32,18 @@ public class ServerFacade {
 
     public JoinResponse join(JoinRequest request) throws DataAccessException {
         String path = "/game";
+        return this.makeRequest("PUT", path, request, JoinResponse.class);
     }
 
     public CreateResponse createGame(CreateRequest request) throws DataAccessException {
         String path = "/game";
-
+        String method = "POST";
+        return this.makeRequest(method, path, request, CreateResponse.class);
     }
 
     public ListResponse listGames(ListRequest request) throws DataAccessException {
         var path = "/game";
-        // this is going to have to be fixed somehow later...
-        // I have no idea what I am doing
-        return this.makeRequest("GET", path, null, null);
+        return this.makeRequest("GET", path, request, ListResponse.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
@@ -65,7 +65,7 @@ public class ServerFacade {
     }
 
 
-    private static void writeBody(Object request, HttpURLConnection http) throws DataAccessException {
+    private static void writeBody(Object request, HttpURLConnection http) throws DataAccessException, IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
             String reqData = new Gson().toJson(request);
@@ -80,11 +80,13 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw DataAccessException.fromJson(respErr);
+                    // I am not sure what to do with this...
+                    // this will definitely need to be changed later
+                    throw new IOException("IOException happened for some reason");
                 }
             }
 
-            throw new DataAccessException(status, "other failure: " + status);
+            throw new DataAccessException("Error: something went wrong...");
         }
     }
 

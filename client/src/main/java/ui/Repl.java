@@ -6,19 +6,10 @@ import chess.ChessPosition;
 
 import java.util.HashSet;
 
-public class Repl implements BoardDisplay{
+public class Repl implements MessagePrinter{
 
-    private final String bunchOfSpaces = " ";
-
-
-    @Override
-    public void displayBlackBoard(ChessGame game, HashSet<ChessPosition> validSquares) {
-        System.out.println("\n" + SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK);
-    }
-
-    @Override
-    public void displayWhiteBoard(ChessGame game, HashSet<ChessPosition> validSquares) {
-
+    public void run(){
+        System.out.println("Hello and welcome to Eden's Chess Game. Please sign in to start playing");
     }
 
     @Override
