@@ -36,8 +36,6 @@ public class ChessClient {
             case "logout" -> logout();
             default -> help();
         });
-        // this is the function that should work to evaluate all the strings and then
-        // call the necessary functions to get the correct responses
     }
 
     public String help(){
@@ -49,7 +47,7 @@ public class ChessClient {
             helpString.append("Login: username and password to login to account\n");
             helpString.append("Quit: exit the program\n");
         } else {
-            helpString.append("Logout");
+            helpString.append("Logout\n");
             helpString.append("Create: supply name for a new chess game \n");
             helpString.append("List: get a list of all the current games\n");
             helpString.append("Play: request to play a certain game using the game ID\n");

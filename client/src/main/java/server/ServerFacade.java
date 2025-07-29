@@ -55,7 +55,7 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             // I will probably need to change this for GET methods
-            if (method.equalsIgnoreCase("GET")){
+            if (!method.equalsIgnoreCase("GET") && request != null) {
                 http.setDoOutput(true);
                 writeBody(request, http);
             } else {
@@ -88,7 +88,7 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw new IOException("IOException happened for some reason");
+                    throw new IOException("IOException happened for some reason" + status);
                 }
             }
             throw new DataAccessException("Error: something went wrong..." + status);
