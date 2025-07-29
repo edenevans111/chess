@@ -7,6 +7,9 @@ import response.RegisterResponse;
 import server.*;
 import request.LoginRequest;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 public class ChessClient {
     // handles all the logic for the Repl parameters
     // validation of the input
@@ -21,12 +24,21 @@ public class ChessClient {
         this.serverFacade = new server.ServerFacade(serverUrl);
     }
 
-    public Object eval(String args){
+    public String eval(String line) throws DataAccessException {
+        String [] args = line.toLowerCase().split(" ");
+        String command = (args.length > 0) ? args[0] : "help";
+        var parameters = Arrays.copyOfRange(args, 1, args.length);
+        return(switch(command){
+            case "login" -> login(parameters);
+            case "register" -> register(parameters);
+
+            default -> help();
+        });
         // this is the function that should work to evaluate all the strings and then
         // call the necessary functions to get the correct responses
     }
 
-    public String preloginHelp(){
+    public String help(){
         StringBuilder helpString = new StringBuilder();
         helpString.append("Register: supply username, password, email to create an account\n");
         helpString.append("Login: username and password to login to account\n");
@@ -35,8 +47,8 @@ public class ChessClient {
     }
 
     public String login(String [] args) throws DataAccessException {
-        String username = args[1];
-        String password = args[2];
+        String username = args[0];
+        String password = args[1];
         StringBuilder loginString = new StringBuilder();
         if(password.isBlank()){
             loginString.append("No password was given");
@@ -51,9 +63,12 @@ public class ChessClient {
     }
 
     public String register(String [] args) throws DataAccessException {
-        String username = args[1];
-        String password = args[2];
-        String email = args[3];
+        if(args.length < 3){
+            System.out.println("Not enough information was given");
+        }
+        String username = args[0];
+        String password = args[1];
+        String email = args[2];
         StringBuilder registerString = new StringBuilder();
 
         if(username.isBlank()){
@@ -63,7 +78,6 @@ public class ChessClient {
         } else if (email.isBlank()){
             registerString.append("No email was given");
         } else {
-            // I might want to change this to a try and catch thing later on, so that I can better handle the errors
             RegisterRequest request = new RegisterRequest(username, password, email);
             RegisterResponse response = serverFacade.register(request);
             registerString.append("Welcome! You are now signed in as " + response.username());

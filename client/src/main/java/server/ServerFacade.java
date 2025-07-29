@@ -11,6 +11,7 @@ import java.net.*;
 public class ServerFacade {
 
     private final String serverUrl;
+    private static final Gson gson = new Gson();
 
     public ServerFacade(String serverUrl){
         this.serverUrl = serverUrl;
@@ -29,7 +30,7 @@ public class ServerFacade {
     public void logout(LogoutRequest request) throws DataAccessException {
         String path = "/session";
         // I think there might be something wrong with this, I'm ot exactly sure what though
-        this.makeRequest("DELETE", path, request, null);
+        this.makeRequest("DELETE", path, null, null);
     }
 
     public JoinResponse join(JoinRequest request) throws DataAccessException {
@@ -45,7 +46,7 @@ public class ServerFacade {
 
     public ListResponse listGames(ListRequest request) throws DataAccessException {
         var path = "/game";
-        return this.makeRequest("GET", path, request, ListResponse.class);
+        return this.makeRequest("GET", path, null, ListResponse.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
@@ -53,9 +54,10 @@ public class ServerFacade {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
-            http.setDoOutput(true);
 
+            http.setDoOutput(true);
             writeBody(request, http);
+            
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
@@ -82,8 +84,6 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    // I am not sure what to do with this...
-                    // this will definitely need to be changed later
                     throw new IOException("IOException happened for some reason");
                 }
             }
@@ -107,6 +107,6 @@ public class ServerFacade {
 
 
     private boolean isSuccessful(int status) {
-        return status == 200;
+        return status >= 200 && status < 300;
     }
 }

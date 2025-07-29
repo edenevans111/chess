@@ -14,15 +14,19 @@ public class Repl implements MessagePrinter{
 
     // I should have three different repl loops (prelogin, postlogin)
 
-    public void run(String [] args){
-        System.out.println("Hello and welcome to Eden's Chess Game. Please login to start playing");
-        System.out.print(client.preloginHelp());
+    public void run(){
+        System.out.println(SET_TEXT_COLOR_WHITE + "Welcome to Eden's Chess Game. Please login to start playing");
+        System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")){
-            String line = scanner.nextLine();
 
+        while (true){
+            printPrompt();
+            String line = scanner.nextLine();
+            if(line.equals("quit")){
+                break;
+            }
             try{
                 result = client.eval(line);
                 System.out.print(result);
@@ -33,21 +37,14 @@ public class Repl implements MessagePrinter{
         }
         System.out.println();
     }
-    // need to do all the pre-loginUI
 
-    public void help(){
-        System.out.print("Register: supply username, password, email \n");
-        System.out.print("Login: username and password");
-        System.out.print("Quit: exit the program");
+    private void printPrompt(){
+        System.out.print("\n" + RESET_TEXT_COLOR + ">>>" + SET_TEXT_COLOR_BLUE);
     }
-
-    // if input == help, display:
-    // quit - exits the program
-    // register - need username, password, email
-    // login - need username and password
 
     @Override
     public void displayMessage(String message) {
         System.out.println(message);
     }
+
 }

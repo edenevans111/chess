@@ -18,7 +18,7 @@ public class Main {
         display.displayWhiteBoard(game);
         display.displayBlackBoard(game);
 
-        new Repl().run(args);
+        new Repl().run();
 
     }
 }
