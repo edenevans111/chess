@@ -54,9 +54,13 @@ public class ServerFacade {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
-
-            http.setDoOutput(true);
-            writeBody(request, http);
+            // I will probably need to change this for GET methods
+            if (method.equalsIgnoreCase("GET")){
+                http.setDoOutput(true);
+                writeBody(request, http);
+            } else {
+                http.setDoOutput(false);
+            }
             
             http.connect();
             throwIfNotSuccessful(http);
@@ -87,8 +91,7 @@ public class ServerFacade {
                     throw new IOException("IOException happened for some reason");
                 }
             }
-
-            throw new DataAccessException("Error: something went wrong...");
+            throw new DataAccessException("Error: something went wrong..." + status);
         }
     }
 

@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Repl implements MessagePrinter{
 
-    ChessClient client = new ChessClient("http://localhost:3306");
+    ChessClient client = new ChessClient("http://localhost:8080");
 
     // I should have three different repl loops (prelogin, postlogin)
 
