@@ -3,25 +3,35 @@ package ui;
 import static ui.EscapeSequences.*;
 import chess.ChessGame;
 import chess.ChessPosition;
+import dataaccess.DataAccessException;
 
 import java.util.HashSet;
+import java.util.Scanner;
 
 public class Repl implements MessagePrinter{
 
     ChessClient client = new ChessClient("http://localhost:3306");
 
-    public void run(String [] args){
-        System.out.println("Hello and welcome to Eden's Chess Game. Please sign in to start playing");
-        while(true) {
-            String outputString = null;
-            if (args[0].equals("help")) {
-                client.preloginHelp();
-            } else if (args[0].equals("quit")){
-                break;
-            }
+    // I should have three different repl loops (prelogin, postlogin)
 
-            System.out.print(outputString);
+    public void run(String [] args){
+        System.out.println("Hello and welcome to Eden's Chess Game. Please login to start playing");
+        System.out.print(client.preloginHelp());
+
+        Scanner scanner = new Scanner(System.in);
+        var result = "";
+        while (!result.equals("quit")){
+            String line = scanner.nextLine();
+
+            try{
+                result = client.eval(line);
+                System.out.print(result);
+            } catch(DataAccessException e){
+                var msg = e.getMessage();
+                System.out.print(msg);
+            }
         }
+        System.out.println();
     }
     // need to do all the pre-loginUI
 
@@ -31,18 +41,6 @@ public class Repl implements MessagePrinter{
         System.out.print("Quit: exit the program");
     }
 
-    public void login(String [] args){
-        String username = args[1];
-        String password = args[2];
-        // create LoginRequest here or make it in another class
-        // server.login(request)
-    }
-
-    public void register(String [] args){
-        String username = args[1];
-        String password = args[2];
-        String email = args[3];
-    }
     // if input == help, display:
     // quit - exits the program
     // register - need username, password, email

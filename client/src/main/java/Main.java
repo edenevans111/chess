@@ -1,5 +1,5 @@
 import chess.*;
-import ui.BoardDisplay;
+import ui.*;
 import ui.ChessBoardPrinter;
 
 import java.util.HashSet;
@@ -17,5 +17,8 @@ public class Main {
         ChessGame game = new ChessGame();
         display.displayWhiteBoard(game);
         display.displayBlackBoard(game);
+
+        new Repl().run(args);
+
     }
 }

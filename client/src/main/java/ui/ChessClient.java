@@ -21,10 +21,17 @@ public class ChessClient {
         this.serverFacade = new server.ServerFacade(serverUrl);
     }
 
-    public void preloginHelp(){
-        System.out.print("Register: supply username, password, email to create an account\n");
-        System.out.print("Login: username and password to login to account\n");
-        System.out.print("Quit: exit the program\n");
+    public Object eval(String args){
+        // this is the function that should work to evaluate all the strings and then
+        // call the necessary functions to get the correct responses
+    }
+
+    public String preloginHelp(){
+        StringBuilder helpString = new StringBuilder();
+        helpString.append("Register: supply username, password, email to create an account\n");
+        helpString.append("Login: username and password to login to account\n");
+        helpString.append("Quit: exit the program\n");
+        return helpString.toString();
     }
 
     public String login(String [] args) throws DataAccessException {
@@ -63,7 +70,7 @@ public class ChessClient {
         }
         return registerString.toString();
     }
-    
+
 
 
 
