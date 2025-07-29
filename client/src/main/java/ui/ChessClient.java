@@ -1,6 +1,7 @@
 package ui;
 
 import dataaccess.DataAccessException;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import response.LoginResponse;
 import response.RegisterResponse;
@@ -15,6 +16,7 @@ public class ChessClient {
     // validation of the input
     private String serverUrl;
     private ServerFacade serverFacade;
+    private boolean isLoggedIn = false;
 
     // I need to ask about how to make the server.ServerFacade object
     // I cannot figure out how to make it correctly for whatever reason
@@ -31,7 +33,7 @@ public class ChessClient {
         return(switch(command){
             case "login" -> login(parameters);
             case "register" -> register(parameters);
-
+            case "logout" -> logout();
             default -> help();
         });
         // this is the function that should work to evaluate all the strings and then
@@ -39,10 +41,21 @@ public class ChessClient {
     }
 
     public String help(){
+
         StringBuilder helpString = new StringBuilder();
-        helpString.append("Register: supply username, password, email to create an account\n");
-        helpString.append("Login: username and password to login to account\n");
-        helpString.append("Quit: exit the program\n");
+
+        if(!isLoggedIn){
+            helpString.append("Register: supply username, password, email to create an account\n");
+            helpString.append("Login: username and password to login to account\n");
+            helpString.append("Quit: exit the program\n");
+        } else {
+            helpString.append("Logout");
+            helpString.append("Create: supply name for a new chess game \n");
+            helpString.append("List: get a list of all the current games\n");
+            helpString.append("Play: request to play a certain game using the game ID\n");
+            helpString.append("Observe: indicate a game you would wish to watch\n");
+        }
+
         return helpString.toString();
     }
 
@@ -58,6 +71,7 @@ public class ChessClient {
             LoginRequest request = new LoginRequest(username, password);
             LoginResponse response = serverFacade.login(request);
             loginString.append("Congratulations, you are logged in as " + response.username());
+            isLoggedIn = true;
         }
         return loginString.toString();
     }
@@ -81,11 +95,20 @@ public class ChessClient {
             RegisterRequest request = new RegisterRequest(username, password, email);
             RegisterResponse response = serverFacade.register(request);
             registerString.append("Welcome! You are now signed in as " + response.username());
+            isLoggedIn = true;
         }
         return registerString.toString();
     }
 
+    private String logout() throws DataAccessException {
+        StringBuilder logoutString = new StringBuilder();
 
+        LogoutRequest request = new LogoutRequest();
+        serverFacade.logout(request);
+        logoutString.append("You are now logged out");
+
+        return logoutString.toString();
+    }
 
 
 
