@@ -12,6 +12,7 @@ public class ServerFacade {
 
     private final String serverUrl;
     private static final Gson gson = new Gson();
+    private String authToken;
 
     public ServerFacade(String serverUrl){
         this.serverUrl = serverUrl;
@@ -19,12 +20,16 @@ public class ServerFacade {
 
     public RegisterResponse register(RegisterRequest request) throws DataAccessException {
         String path = "/user";
-        return this.makeRequest("POST", path, request, RegisterResponse.class);
+        RegisterResponse response =  this.makeRequest("POST", path, request, RegisterResponse.class);
+        this.authToken = response.authToken();
+        return response;
     }
 
     public LoginResponse login(LoginRequest request) throws DataAccessException {
         String path = "/session";
-        return this.makeRequest("POST", path, request, LoginResponse.class);
+        LoginResponse response =  this.makeRequest("POST", path, request, LoginResponse.class);
+        this.authToken = response.authToken();
+        return response;
     }
 
     public void logout(LogoutRequest request) throws DataAccessException {
@@ -54,6 +59,9 @@ public class ServerFacade {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
+            if(authToken != null && !this.authToken.isBlank()){
+                http.addRequestProperty("authorization", authToken);
+            }
             // I will probably need to change this for GET methods
             if (!method.equalsIgnoreCase("GET") && request != null) {
                 http.setDoOutput(true);
@@ -88,7 +96,7 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw new IOException("IOException happened for some reason" + status);
+                    throw new IOException("IOException happened for some reason " + status);
                 }
             }
             throw new DataAccessException("Error: something went wrong..." + status);

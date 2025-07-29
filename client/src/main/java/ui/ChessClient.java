@@ -2,11 +2,9 @@ package ui;
 
 import chess.ChessGame;
 import dataaccess.DataAccessException;
+import model.GameData;
 import request.*;
-import response.CreateResponse;
-import response.JoinResponse;
-import response.LoginResponse;
-import response.RegisterResponse;
+import response.*;
 import server.*;
 
 import java.util.Arrays;
@@ -38,6 +36,7 @@ public class ChessClient {
             case "create" -> createGame(parameters);
             case "list" -> listGames();
             case "join" -> joinGame(parameters);
+            case "observe" -> observeGame(parameters);
             default -> help();
         });
     }
@@ -125,11 +124,13 @@ public class ChessClient {
         return createString.toString();
     }
 
-    private String listGames(){
+    private String listGames() throws DataAccessException {
         StringBuilder listString = new StringBuilder();
-
-
-
+        ListRequest request = new ListRequest();
+        ListResponse response = serverFacade.listGames(request);
+        for(GameData game : response.games()){
+            listString.append(game.gameID() + " : " + game.gameName() + "\n");
+        }
         return listString.toString();
     }
 
@@ -142,8 +143,14 @@ public class ChessClient {
             ChessGame.TeamColor teamColor;
             if(args[0].toLowerCase().equals("white")){
                 teamColor = ChessGame.TeamColor.WHITE;
+                BoardDisplay display = new ChessBoardPrinter();
+                ChessGame game = new ChessGame();
+                display.displayWhiteBoard(game);
             } else {
                 teamColor = ChessGame.TeamColor.BLACK;
+                BoardDisplay display = new ChessBoardPrinter();
+                ChessGame game = new ChessGame();
+                display.displayBlackBoard(game);
             }
             int gameID = Integer.parseInt(args[1]);
             JoinRequest request = new JoinRequest(teamColor, gameID);
@@ -151,6 +158,24 @@ public class ChessClient {
             joinString.append("Now joining game" + gameID);
         }
         return joinString.toString();
+    }
+
+    private String observeGame(String [] args) throws DataAccessException {
+        StringBuilder observeString = new StringBuilder();
+
+        if(args.length < 1){
+            observeString.append("Need to specify a game");
+        } else {
+            int gameID = Integer.parseInt(args[0]);
+            JoinRequest request = new JoinRequest(null, gameID);
+            JoinResponse response = serverFacade.join(request);
+            observeString.append("You are now joining game: " + gameID);
+            BoardDisplay boardDisplay = new ChessBoardPrinter();
+            ChessGame game = new ChessGame();
+            boardDisplay.displayWhiteBoard(game);
+        }
+
+        return observeString.toString();
     }
 
 }
