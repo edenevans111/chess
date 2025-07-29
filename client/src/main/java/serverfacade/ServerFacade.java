@@ -1,7 +1,7 @@
 package serverfacade;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import request.*;
 import response.*;
 
