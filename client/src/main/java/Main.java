@@ -16,6 +16,6 @@ public class Main {
         BoardDisplay display = new ChessBoardPrinter();
         ChessGame game = new ChessGame();
         display.displayWhiteBoard(game);
-
+        display.displayBlackBoard(game);
     }
 }
