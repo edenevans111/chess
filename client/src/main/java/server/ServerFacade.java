@@ -1,3 +1,5 @@
+package server;
+
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import request.*;
@@ -10,8 +12,8 @@ public class ServerFacade {
 
     private final String serverUrl;
 
-    public ServerFacade(String url){
-        serverUrl = url;
+    public ServerFacade(String serverUrl){
+        this.serverUrl = serverUrl;
     }
 
     public RegisterResponse register(RegisterRequest request) throws DataAccessException {

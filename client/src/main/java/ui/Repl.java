@@ -7,13 +7,17 @@ import chess.ChessPosition;
 import java.util.HashSet;
 
 public class Repl implements MessagePrinter{
-    ChessClient client = new ChessClient();
+
+    ChessClient client = new ChessClient("http://localhost:3306");
+
     public void run(String [] args){
         System.out.println("Hello and welcome to Eden's Chess Game. Please sign in to start playing");
         while(true) {
             String outputString = null;
             if (args[0].equals("help")) {
-                outputString = client.help();
+                client.help();
+            } else if (args[0].equals("quit")){
+                break;
             }
 
             System.out.print(outputString);

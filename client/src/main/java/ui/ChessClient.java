@@ -1,20 +1,26 @@
 package ui;
 
+import server.*;
 import request.LoginRequest;
 
 public class ChessClient {
     // handles all the logic for the Repl parameters
     // validation of the input
-    public ChessClient(){
+    private String serverUrl;
+    private ServerFacade serverFacade;
 
+    // I need to ask about how to make the server.ServerFacade object
+    // I cannot figure out how to make it correctly for whatever reason
+
+    public ChessClient(String serverUrl){
+        this.serverUrl = serverUrl;
+        this.serverFacade = new server.ServerFacade(serverUrl);
     }
 
-    public String help(){
-        StringBuilder helpString = new StringBuilder();
+    public void help(){
         System.out.print("Register: supply username, password, email\n");
         System.out.print("Login: username and password\n");
         System.out.print("Quit: exit the program\n");
-        return helpString.toString();
     }
 
     public String login(String [] args){
@@ -27,10 +33,11 @@ public class ChessClient {
             loginString.append("No username was given");
         }
         LoginRequest request = new LoginRequest(username, password);
-        // now I need to call the ServerFacade and pass the request in
-        // now I need to make a LoginRequest and call the ServerFacade
+        // now I need to call the server.ServerFacade and pass the request in
+        // now I need to make a LoginRequest and call the server.ServerFacade
 
         return loginString.toString();
     }
+
 
 }
