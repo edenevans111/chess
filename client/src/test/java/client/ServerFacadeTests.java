@@ -12,12 +12,14 @@ import serverfacade.ServerFacade;
 public class ServerFacadeTests {
 
     private static Server server;
+    static ServerFacade facade;
 
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(0);
+        var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
+        facade = new ServerFacade("http://localhost:8080");
     }
 
     @AfterAll
@@ -34,9 +36,9 @@ public class ServerFacadeTests {
 
     @Test
     public void registerPositive() throws DataAccessException {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         RegisterRequest request = new RegisterRequest("username1", "password1", "email1@email.com");
-        RegisterResponse response = serverFacade.register(request);
+        RegisterResponse response = facade.register(request);
+        Assertions.assertNotNull(response);
     }
 
     @Test
