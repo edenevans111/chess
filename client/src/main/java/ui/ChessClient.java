@@ -1,5 +1,7 @@
 package ui;
 
+import dataaccess.DataAccessException;
+import response.LoginResponse;
 import server.*;
 import request.LoginRequest;
 
@@ -17,13 +19,13 @@ public class ChessClient {
         this.serverFacade = new server.ServerFacade(serverUrl);
     }
 
-    public void help(){
+    public void preloginHelp(){
         System.out.print("Register: supply username, password, email\n");
         System.out.print("Login: username and password\n");
         System.out.print("Quit: exit the program\n");
     }
 
-    public String login(String [] args){
+    public String login(String [] args) throws DataAccessException {
         String username = args[1];
         String password = args[2];
         StringBuilder loginString = new StringBuilder();
@@ -33,11 +35,14 @@ public class ChessClient {
             loginString.append("No username was given");
         }
         LoginRequest request = new LoginRequest(username, password);
-        // now I need to call the server.ServerFacade and pass the request in
-        // now I need to make a LoginRequest and call the server.ServerFacade
-
+        LoginResponse response = serverFacade.login(request);
+        loginString.append("Congratulations, you are logged in as " + response.username());
         return loginString.toString();
     }
+
+    //
+
+
 
 
 }

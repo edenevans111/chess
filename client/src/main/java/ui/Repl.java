@@ -15,7 +15,7 @@ public class Repl implements MessagePrinter{
         while(true) {
             String outputString = null;
             if (args[0].equals("help")) {
-                client.help();
+                client.preloginHelp();
             } else if (args[0].equals("quit")){
                 break;
             }
