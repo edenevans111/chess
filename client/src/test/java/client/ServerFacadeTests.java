@@ -1,7 +1,10 @@
 package client;
 
+import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
+import request.LogoutRequest;
 import server.Server;
+import server.ServerFacade;
 
 
 public class ServerFacadeTests {
@@ -24,6 +27,14 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
+    }
+
+    @Test
+    void logoutPositive() throws DataAccessException {
+        ServerFacade facade = new ServerFacade("http://localhost:8080");
+        LogoutRequest request = new LogoutRequest();
+
+
     }
 
 }

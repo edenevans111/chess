@@ -1,12 +1,13 @@
 package ui;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
-import request.LogoutRequest;
-import request.RegisterRequest;
+import request.*;
+import response.CreateResponse;
+import response.JoinResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import server.*;
-import request.LoginRequest;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +35,9 @@ public class ChessClient {
             case "login" -> login(parameters);
             case "register" -> register(parameters);
             case "logout" -> logout();
+            case "create" -> createGame(parameters);
+            case "list" -> listGames();
+            case "join" -> joinGame(parameters);
             default -> help();
         });
     }
@@ -108,6 +112,45 @@ public class ChessClient {
         return logoutString.toString();
     }
 
+    private String createGame(String [] args) throws DataAccessException {
+        StringBuilder createString = new StringBuilder();
 
+        if(args.length < 1){
+            createString.append("Need to supply a game name");
+        }
+        String gameName = args[0];
+        CreateRequest request = new CreateRequest(gameName);
+        CreateResponse response = serverFacade.createGame(request);
+        createString.append("You have successfully created game: " + gameName);
+        return createString.toString();
+    }
+
+    private String listGames(){
+        StringBuilder listString = new StringBuilder();
+
+
+
+        return listString.toString();
+    }
+
+    private String joinGame(String [] args) throws DataAccessException {
+        StringBuilder joinString = new StringBuilder();
+
+        if(args.length < 2){
+            joinString.append("Not enough information provided");
+        } else {
+            ChessGame.TeamColor teamColor;
+            if(args[0].toLowerCase().equals("white")){
+                teamColor = ChessGame.TeamColor.WHITE;
+            } else {
+                teamColor = ChessGame.TeamColor.BLACK;
+            }
+            int gameID = Integer.parseInt(args[1]);
+            JoinRequest request = new JoinRequest(teamColor, gameID);
+            JoinResponse response = serverFacade.join(request);
+            joinString.append("Now joining game" + gameID);
+        }
+        return joinString.toString();
+    }
 
 }

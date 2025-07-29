@@ -21,7 +21,7 @@ public class Repl implements MessagePrinter{
         Scanner scanner = new Scanner(System.in);
         var result = "";
 
-        while (true){
+        while (!result.equals("quit")){
             printPrompt();
             String line = scanner.nextLine();
             if(line.equals("quit")){
