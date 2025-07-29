@@ -5,10 +5,9 @@ import dataaccess.DataAccessException;
 import model.GameData;
 import request.*;
 import response.*;
-import server.*;
+import serverfacade.ServerFacade;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 public class ChessClient {
     // handles all the logic for the Repl parameters
@@ -22,7 +21,7 @@ public class ChessClient {
 
     public ChessClient(String serverUrl){
         this.serverUrl = serverUrl;
-        this.serverFacade = new server.ServerFacade(serverUrl);
+        this.serverFacade = new ServerFacade(serverUrl);
     }
 
     public String eval(String line) throws DataAccessException {

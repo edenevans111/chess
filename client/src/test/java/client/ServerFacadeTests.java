@@ -4,7 +4,7 @@ import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
 import request.LogoutRequest;
 import server.Server;
-import server.ServerFacade;
+import serverfacade.ServerFacade;
 
 
 public class ServerFacadeTests {
