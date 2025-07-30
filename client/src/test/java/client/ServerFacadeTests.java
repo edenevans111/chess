@@ -32,7 +32,7 @@ public class ServerFacadeTests {
 
     @Test
     public void registerPositive() throws ResponseException {
-        RegisterRequest request = new RegisterRequest("username3", "password2", "email2@email.com");
+        RegisterRequest request = new RegisterRequest("username4", "password2", "email2@email.com");
         RegisterResponse response = facade.register(request);
         Assertions.assertNotNull(response);
     }
@@ -53,18 +53,18 @@ public class ServerFacadeTests {
     @Test
     public void loginNegative() throws ResponseException {
         LoginRequest request = new LoginRequest("badUsername", "terriblePassword");
-        Assertions.assertThrows(DataAccessException.class, () -> facade.login(request));
+        Assertions.assertThrows(ResponseException.class, () -> facade.login(request));
     }
 
     @Test
     public void logoutPositive() throws ResponseException {
         try {
-            RegisterRequest registerReq = new RegisterRequest("eden", "eden", "eden@email.com");
+            RegisterRequest registerReq = new RegisterRequest("newestEden", "eden", "eden@email.com");
             facade.register(registerReq);
         } catch (ResponseException e) {
             throw new ResponseException("Error: already taken");
         }
-        LoginRequest loginReq = new LoginRequest("eden", "eden");
+        LoginRequest loginReq = new LoginRequest("newestEden", "eden");
         LoginResponse loginResp = facade.login(loginReq);
 
         LogoutRequest logoutReq = new LogoutRequest();
@@ -75,7 +75,7 @@ public class ServerFacadeTests {
     @Test
     public void logoutNegative() throws ResponseException {
         LogoutRequest request = new LogoutRequest();
-        Assertions.assertThrows(DataAccessException.class, () -> facade.logout(request));
+        Assertions.assertThrows(ResponseException.class, () -> facade.logout(request));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ServerFacadeTests {
         LoginResponse response = facade.login(request);
 
         JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.BLACK, 6);
-        Assertions.assertThrows(DataAccessException.class, () -> facade.join(joinRequest));
+        Assertions.assertThrows(ResponseException.class, () -> facade.join(joinRequest));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class ServerFacadeTests {
     @Test
     public void createGameNegative() throws ResponseException {
         CreateRequest createRequest = new CreateRequest("DifferentGame");
-        Assertions.assertThrows(DataAccessException.class, () -> facade.createGame(createRequest));
+        Assertions.assertThrows(ResponseException.class, () -> facade.createGame(createRequest));
     }
 
     @Test
@@ -129,6 +129,6 @@ public class ServerFacadeTests {
     @Test
     public void listGamesNegative() throws ResponseException {
         ListRequest listRequest = new ListRequest();
-        Assertions.assertThrows(DataAccessException.class, () -> facade.listGames(listRequest));
+        Assertions.assertThrows(ResponseException.class, () -> facade.listGames(listRequest));
     }
 }
