@@ -90,25 +90,30 @@ public class ChessClient {
     }
 
     public String register(String [] args) throws ResponseException {
-        if(args.length < 3){
-            System.out.println("Not enough information was given");
-        }
-        String username = args[0];
-        String password = args[1];
-        String email = args[2];
         StringBuilder registerString = new StringBuilder();
-
-        if(username.isBlank()){
-            registerString.append("No username given");
-        } else if (password.isBlank()){
-            registerString.append("No password was given");
-        } else if (email.isBlank()){
-            registerString.append("No email was given");
+        if(args.length != 3){
+            registerString.append("Wrong information given");
         } else {
-            RegisterRequest request = new RegisterRequest(username, password, email);
-            RegisterResponse response = serverFacade.register(request);
-            registerString.append("Welcome! You are now signed in as " + response.username());
-            isLoggedIn = true;
+            String username = args[0];
+            String password = args[1];
+            String email = args[2];
+
+            if(username.isBlank()){
+                registerString.append("No username given");
+            } else if (password.isBlank()){
+                registerString.append("No password was given");
+            } else if (email.isBlank()){
+                registerString.append("No email was given");
+            } else {
+                try{
+                    RegisterRequest request = new RegisterRequest(username, password, email);
+                    RegisterResponse response = serverFacade.register(request);
+                    registerString.append("Welcome! You are now signed in as " + response.username());
+                    isLoggedIn = true;
+                } catch (ResponseException e){
+                    registerString.append("Unable to register");
+                }
+            }
         }
         return registerString.toString();
     }
