@@ -31,7 +31,7 @@ public class ServerFacadeTests {
 
     @Test
     public void registerPositive() throws DataAccessException {
-        RegisterRequest request = new RegisterRequest("username2", "password2", "email2@email.com");
+        RegisterRequest request = new RegisterRequest("username3", "password2", "email2@email.com");
         RegisterResponse response = facade.register(request);
         Assertions.assertNotNull(response);
     }
