@@ -114,7 +114,7 @@ public class ChessClient {
         StringBuilder createString = new StringBuilder();
 
         if(args.length < 1){
-            createString.append("Need to supply a game name");
+            createString.append("Need to supply a game name (name must be one word) ");
         }
         String gameName = args[0];
         CreateRequest request = new CreateRequest(gameName);
@@ -142,18 +142,18 @@ public class ChessClient {
             ChessGame.TeamColor teamColor;
             if(args[0].toLowerCase().equals("white")){
                 teamColor = ChessGame.TeamColor.WHITE;
+                ChessGame game = new ChessGame();
+                BoardDisplay display = new ChessBoardPrinter();
+                display.displayWhiteBoard(game);
             } else {
                 teamColor = ChessGame.TeamColor.BLACK;
+                ChessGame game = new ChessGame();
+                BoardDisplay display = new ChessBoardPrinter();
+                display.displayBlackBoard(game);
             }
             int gameID = Integer.parseInt(args[1]);
             JoinRequest request = new JoinRequest(teamColor, gameID);
             JoinResponse response = serverFacade.join(request);
-            BoardDisplay display = new ChessBoardPrinter();
-            if(teamColor == ChessGame.TeamColor.WHITE){
-                display.displayWhiteBoard(gameData.game());
-            } else {
-                display.displayBlackBoard(gameData.game());
-            }
             joinString.append("Now joining game " + gameID);
         }
         return joinString.toString();

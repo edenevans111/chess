@@ -3,7 +3,7 @@ package ui;
 import static ui.EscapeSequences.*;
 import chess.ChessGame;
 import chess.ChessPosition;
-import dataaccess.*;
+import serverfacade.ResponseException;
 
 import java.util.HashSet;
 import java.util.Scanner;
@@ -28,7 +28,7 @@ public class Repl implements MessagePrinter{
             try{
                 result = client.eval(line);
                 System.out.print(result);
-            } catch(DataAccessException e){
+            } catch(ResponseException e){
                 var msg = e.getMessage();
                 System.out.print(msg);
             }
