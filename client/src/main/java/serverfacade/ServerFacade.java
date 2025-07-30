@@ -10,7 +10,6 @@ import java.net.*;
 public class ServerFacade {
 
     private final String serverUrl;
-    private static final Gson gson = new Gson();
     private String authToken;
 
     public ServerFacade(String serverUrl){

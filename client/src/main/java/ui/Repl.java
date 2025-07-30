@@ -8,7 +8,7 @@ import serverfacade.ResponseException;
 import java.util.HashSet;
 import java.util.Scanner;
 
-public class Repl implements MessagePrinter{
+public class Repl{
 
     ChessClient client = new ChessClient("http://localhost:8080");
 
@@ -38,11 +38,6 @@ public class Repl implements MessagePrinter{
 
     private void printPrompt(){
         System.out.print("\n" + RESET_TEXT_COLOR + ">>>" + SET_TEXT_COLOR_BLUE);
-    }
-
-    @Override
-    public void displayMessage(String message) {
-        System.out.println(message);
     }
 
 }
