@@ -62,7 +62,6 @@ public class ServerFacade {
             if(authToken != null && !this.authToken.isBlank()){
                 http.addRequestProperty("authorization", authToken);
             }
-            // I will probably need to change this for GET methods
             if (!method.equalsIgnoreCase("GET") && request != null) {
                 http.setDoOutput(true);
                 writeBody(request, http);
