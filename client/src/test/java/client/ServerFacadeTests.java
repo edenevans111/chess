@@ -45,10 +45,10 @@ public class ServerFacadeTests {
 
     @Test
     public void loginPositive() throws ResponseException {
-        RegisterRequest registerRequest = new RegisterRequest("eden", "eden", "email");
+        RegisterRequest registerRequest = new RegisterRequest("NewPerson", "eden", "email");
         RegisterResponse registerResponse = facade.register(registerRequest);
 
-        LoginRequest loginRequest = new LoginRequest("eden", "eden");
+        LoginRequest loginRequest = new LoginRequest("NewPerson", "eden");
         LoginResponse loginResponse = facade.login(loginRequest);
         Assertions.assertNotNull(loginResponse.authToken());
     }
