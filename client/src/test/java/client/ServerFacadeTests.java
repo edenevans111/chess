@@ -4,10 +4,7 @@ import chess.ChessGame;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
 import request.*;
-import response.CreateResponse;
-import response.JoinResponse;
-import response.LoginResponse;
-import response.RegisterResponse;
+import response.*;
 import server.Server;
 import serverfacade.ServerFacade;
 
@@ -114,16 +111,23 @@ public class ServerFacadeTests {
 
     @Test
     public void createGameNegative() throws DataAccessException {
-        // not logged in
+        CreateRequest createRequest = new CreateRequest("DifferentGame");
+        Assertions.assertThrows(DataAccessException.class, () -> facade.createGame(createRequest));
     }
 
     @Test
     public void listGamesPositive() throws DataAccessException {
+        LoginRequest loginRequest = new LoginRequest("username2", "password2");
+        LoginResponse loginResponse = facade.login(loginRequest);
 
+        ListRequest listRequest = new ListRequest();
+        ListResponse listResponse = facade.listGames(listRequest);
+        Assertions.assertNotNull(listResponse);
     }
 
     @Test
     public void listGamesNegative() throws DataAccessException {
-        // also not logged in
+        ListRequest listRequest = new ListRequest();
+        Assertions.assertThrows(DataAccessException.class, () -> facade.listGames(listRequest));
     }
 }
