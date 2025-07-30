@@ -53,22 +53,35 @@ public class ServerFacadeTests {
 
     @Test
     public void loginNegative() throws DataAccessException {
-        Assertions.assertThrows(DataAccessException.class, () -> new LoginRequest("badUsername", "terriblePassword"));
+        LoginRequest request = new LoginRequest("badUsername", "terriblePassword");
+        Assertions.assertThrows(DataAccessException.class, () -> facade.login(request));
     }
 
     @Test
     public void logoutPositive() throws DataAccessException {
-        LogoutRequest request = new LogoutRequest();
+        try {
+            RegisterRequest registerReq = new RegisterRequest("eden", "eden", "eden@email.com");
+            facade.register(registerReq);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: already taken");
+        }
+        LoginRequest loginReq = new LoginRequest("eden", "eden");
+        LoginResponse loginResp = facade.login(loginReq);
+
+        LogoutRequest logoutReq = new LogoutRequest();
+        facade.logout(logoutReq);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void logoutNegative() throws DataAccessException {
-
+        LogoutRequest request = new LogoutRequest();
+        Assertions.assertThrows(DataAccessException.class, () -> facade.logout(request));
     }
 
     @Test
     public void joinGamePositive() throws DataAccessException {
-
+        
     }
 
     @Test
@@ -95,6 +108,4 @@ public class ServerFacadeTests {
     public void listGamesNegative() throws DataAccessException {
 
     }
-
-
 }
