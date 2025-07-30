@@ -1,11 +1,10 @@
 package ui;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.SQLGameDAO;
 import model.GameData;
 import request.*;
 import response.*;
+import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
 
 import java.util.Arrays;
@@ -16,7 +15,6 @@ public class ChessClient {
     private String serverUrl;
     private ServerFacade serverFacade;
     private boolean isLoggedIn = false;
-    SQLGameDAO gameDAO;
 
     // I need to ask about how to make the server.ServerFacade object
     // I cannot figure out how to make it correctly for whatever reason
@@ -26,7 +24,7 @@ public class ChessClient {
         this.serverFacade = new ServerFacade(serverUrl);
     }
 
-    public String eval(String line) throws DataAccessException {
+    public String eval(String line) throws ResponseException {
         String [] args = line.toLowerCase().split(" ");
         String command = (args.length > 0) ? args[0] : "help";
         var parameters = Arrays.copyOfRange(args, 1, args.length);
@@ -61,7 +59,7 @@ public class ChessClient {
         return helpString.toString();
     }
 
-    public String login(String [] args) throws DataAccessException {
+    public String login(String [] args) throws ResponseException {
         String username = args[0];
         String password = args[1];
         StringBuilder loginString = new StringBuilder();
@@ -78,7 +76,7 @@ public class ChessClient {
         return loginString.toString();
     }
 
-    public String register(String [] args) throws DataAccessException {
+    public String register(String [] args) throws ResponseException {
         if(args.length < 3){
             System.out.println("Not enough information was given");
         }
@@ -102,7 +100,7 @@ public class ChessClient {
         return registerString.toString();
     }
 
-    private String logout() throws DataAccessException {
+    private String logout() throws ResponseException {
         StringBuilder logoutString = new StringBuilder();
 
         LogoutRequest request = new LogoutRequest();
@@ -112,7 +110,7 @@ public class ChessClient {
         return logoutString.toString();
     }
 
-    private String createGame(String [] args) throws DataAccessException {
+    private String createGame(String [] args) throws ResponseException {
         StringBuilder createString = new StringBuilder();
 
         if(args.length < 1){
@@ -125,7 +123,7 @@ public class ChessClient {
         return createString.toString();
     }
 
-    private String listGames() throws DataAccessException {
+    private String listGames() throws ResponseException {
         StringBuilder listString = new StringBuilder();
         ListRequest request = new ListRequest();
         ListResponse response = serverFacade.listGames(request);
@@ -135,7 +133,7 @@ public class ChessClient {
         return listString.toString();
     }
 
-    private String joinGame(String [] args) throws DataAccessException {
+    private String joinGame(String [] args) throws ResponseException {
         StringBuilder joinString = new StringBuilder();
 
         if(args.length < 2){
@@ -150,7 +148,6 @@ public class ChessClient {
             int gameID = Integer.parseInt(args[1]);
             JoinRequest request = new JoinRequest(teamColor, gameID);
             JoinResponse response = serverFacade.join(request);
-            GameData gameData = gameDAO.getGame(gameID);
             BoardDisplay display = new ChessBoardPrinter();
             if(teamColor == ChessGame.TeamColor.WHITE){
                 display.displayWhiteBoard(gameData.game());
@@ -162,7 +159,7 @@ public class ChessClient {
         return joinString.toString();
     }
 
-    private String observeGame(String [] args) throws DataAccessException {
+    private String observeGame(String [] args) throws ResponseException {
         StringBuilder observeString = new StringBuilder();
 
         if(args.length < 1){
