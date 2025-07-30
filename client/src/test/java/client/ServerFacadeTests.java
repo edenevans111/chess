@@ -40,11 +40,14 @@ public class ServerFacadeTests {
     @Test
     public void registerNegative() throws ResponseException {
         RegisterRequest request = new RegisterRequest(null, null, null);
-        Assertions.assertThrows(DataAccessException.class, () -> facade.register(request));
+        Assertions.assertThrows(ResponseException.class, () -> facade.register(request));
     }
 
     @Test
     public void loginPositive() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest("eden", "eden", "email");
+        RegisterResponse registerResponse = facade.register(registerRequest);
+
         LoginRequest loginRequest = new LoginRequest("eden", "eden");
         LoginResponse loginResponse = facade.login(loginRequest);
         Assertions.assertNotNull(loginResponse.authToken());
@@ -102,8 +105,8 @@ public class ServerFacadeTests {
 
     @Test
     public void createGamePositive() throws ResponseException {
-        LoginRequest loginRequest = new LoginRequest("eden", "eden");
-        LoginResponse loginResponse = facade.login(loginRequest);
+        RegisterRequest request = new RegisterRequest("username90", "password2", "email2@email.com");
+        RegisterResponse response = facade.register(request);
 
         CreateRequest createRequest = new CreateRequest("AnotherGame");
         CreateResponse createResponse = facade.createGame(createRequest);
@@ -118,8 +121,8 @@ public class ServerFacadeTests {
 
     @Test
     public void listGamesPositive() throws ResponseException {
-        LoginRequest loginRequest = new LoginRequest("username2", "password2");
-        LoginResponse loginResponse = facade.login(loginRequest);
+        RegisterRequest request = new RegisterRequest("username9", "password2", "email2@email.com");
+        RegisterResponse response = facade.register(request);
 
         ListRequest listRequest = new ListRequest();
         ListResponse listResponse = facade.listGames(listRequest);
