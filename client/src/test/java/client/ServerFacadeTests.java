@@ -29,7 +29,6 @@ public class ServerFacadeTests {
     @AfterAll
     static void stopServer() {
         server.stop();
-
     }
 
 
@@ -105,7 +104,12 @@ public class ServerFacadeTests {
 
     @Test
     public void createGamePositive() throws DataAccessException {
+        LoginRequest loginRequest = new LoginRequest("eden", "eden");
+        LoginResponse loginResponse = facade.login(loginRequest);
 
+        CreateRequest createRequest = new CreateRequest("AnotherGame");
+        CreateResponse createResponse = facade.createGame(createRequest);
+        Assertions.assertNotNull(createResponse.gameID());
     }
 
     @Test
