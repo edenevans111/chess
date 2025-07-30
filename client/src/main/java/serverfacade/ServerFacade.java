@@ -1,7 +1,6 @@
 package serverfacade;
 
 import com.google.gson.Gson;
-import dataaccess.*;
 import request.*;
 import response.*;
 
@@ -18,43 +17,43 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
-    public RegisterResponse register(RegisterRequest request) throws DataAccessException {
+    public RegisterResponse register(RegisterRequest request) throws ResponseException {
         String path = "/user";
         RegisterResponse response =  this.makeRequest("POST", path, request, RegisterResponse.class);
         this.authToken = response.authToken();
         return response;
     }
 
-    public LoginResponse login(LoginRequest request) throws DataAccessException {
+    public LoginResponse login(LoginRequest request) throws ResponseException {
         String path = "/session";
         LoginResponse response =  this.makeRequest("POST", path, request, LoginResponse.class);
         this.authToken = response.authToken();
         return response;
     }
 
-    public void logout(LogoutRequest request) throws DataAccessException {
+    public void logout(LogoutRequest request) throws ResponseException {
         String path = "/session";
         // I think there might be something wrong with this, I'm ot exactly sure what though
         this.makeRequest("DELETE", path, null, null);
     }
 
-    public JoinResponse join(JoinRequest request) throws DataAccessException {
+    public JoinResponse join(JoinRequest request) throws ResponseException {
         String path = "/game";
         return this.makeRequest("PUT", path, request, JoinResponse.class);
     }
 
-    public CreateResponse createGame(CreateRequest request) throws DataAccessException {
+    public CreateResponse createGame(CreateRequest request) throws ResponseException {
         String path = "/game";
         String method = "POST";
         return this.makeRequest(method, path, request, CreateResponse.class);
     }
 
-    public ListResponse listGames(ListRequest request) throws DataAccessException {
+    public ListResponse listGames(ListRequest request) throws ResponseException {
         var path = "/game";
         return this.makeRequest("GET", path, null, ListResponse.class);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException{
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -72,15 +71,15 @@ public class ServerFacade {
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
-        } catch (DataAccessException ex) {
+        } catch (ResponseException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new DataAccessException(ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
     }
 
 
-    private static void writeBody(Object request, HttpURLConnection http) throws DataAccessException, IOException {
+    private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
             String reqData = new Gson().toJson(request);
@@ -90,7 +89,7 @@ public class ServerFacade {
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws DataAccessException, IOException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws ResponseException, IOException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
@@ -98,7 +97,7 @@ public class ServerFacade {
                     throw new IOException("IOException happened for some reason " + status);
                 }
             }
-            throw new DataAccessException("Error: something went wrong..." + status);
+            throw new ResponseException("Error: something went wrong..." + status);
         }
     }
 

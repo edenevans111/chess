@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import request.*;
 import response.*;
 import server.Server;
+import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
 
 
@@ -30,38 +31,38 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void registerPositive() throws DataAccessException {
+    public void registerPositive() throws ResponseException {
         RegisterRequest request = new RegisterRequest("username3", "password2", "email2@email.com");
         RegisterResponse response = facade.register(request);
         Assertions.assertNotNull(response);
     }
 
     @Test
-    public void registerNegative() throws DataAccessException {
+    public void registerNegative() throws ResponseException {
         RegisterRequest request = new RegisterRequest(null, null, null);
         Assertions.assertThrows(DataAccessException.class, () -> facade.register(request));
     }
 
     @Test
-    public void loginPositive() throws DataAccessException {
+    public void loginPositive() throws ResponseException {
         LoginRequest loginRequest = new LoginRequest("eden", "eden");
         LoginResponse loginResponse = facade.login(loginRequest);
         Assertions.assertNotNull(loginResponse.authToken());
     }
 
     @Test
-    public void loginNegative() throws DataAccessException {
+    public void loginNegative() throws ResponseException {
         LoginRequest request = new LoginRequest("badUsername", "terriblePassword");
         Assertions.assertThrows(DataAccessException.class, () -> facade.login(request));
     }
 
     @Test
-    public void logoutPositive() throws DataAccessException {
+    public void logoutPositive() throws ResponseException {
         try {
             RegisterRequest registerReq = new RegisterRequest("eden", "eden", "eden@email.com");
             facade.register(registerReq);
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error: already taken");
+        } catch (ResponseException e) {
+            throw new ResponseException("Error: already taken");
         }
         LoginRequest loginReq = new LoginRequest("eden", "eden");
         LoginResponse loginResp = facade.login(loginReq);
@@ -72,13 +73,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logoutNegative() throws DataAccessException {
+    public void logoutNegative() throws ResponseException {
         LogoutRequest request = new LogoutRequest();
         Assertions.assertThrows(DataAccessException.class, () -> facade.logout(request));
     }
 
     @Test
-    public void joinGamePositive() throws DataAccessException {
+    public void joinGamePositive() throws ResponseException {
         LoginRequest request = new LoginRequest("eden", "eden");
         LoginResponse response = facade.login(request);
 
@@ -91,7 +92,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void joinGameNegative() throws DataAccessException {
+    public void joinGameNegative() throws ResponseException {
         LoginRequest request = new LoginRequest("eden", "eden");
         LoginResponse response = facade.login(request);
 
@@ -100,7 +101,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createGamePositive() throws DataAccessException {
+    public void createGamePositive() throws ResponseException {
         LoginRequest loginRequest = new LoginRequest("eden", "eden");
         LoginResponse loginResponse = facade.login(loginRequest);
 
@@ -110,13 +111,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createGameNegative() throws DataAccessException {
+    public void createGameNegative() throws ResponseException {
         CreateRequest createRequest = new CreateRequest("DifferentGame");
         Assertions.assertThrows(DataAccessException.class, () -> facade.createGame(createRequest));
     }
 
     @Test
-    public void listGamesPositive() throws DataAccessException {
+    public void listGamesPositive() throws ResponseException {
         LoginRequest loginRequest = new LoginRequest("username2", "password2");
         LoginResponse loginResponse = facade.login(loginRequest);
 
@@ -126,7 +127,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGamesNegative() throws DataAccessException {
+    public void listGamesNegative() throws ResponseException {
         ListRequest listRequest = new ListRequest();
         Assertions.assertThrows(DataAccessException.class, () -> facade.listGames(listRequest));
     }
