@@ -105,17 +105,19 @@ public class ServerFacadeTests {
 
     @Test
     public void createGamePositive() throws ResponseException {
-        RegisterRequest request = new RegisterRequest("username38", "password2", "email2@email.com");
+        RegisterRequest request = new RegisterRequest("username53", "password2", "email2@email.com");
         RegisterResponse response = facade.register(request);
 
         CreateRequest createRequest = new CreateRequest("AnotherGame");
         CreateResponse createResponse = facade.createGame(createRequest);
         Assertions.assertNotNull(createResponse.gameID());
+        LogoutRequest logoutRequest = new LogoutRequest();
+        facade.logout(logoutRequest);
     }
 
     @Test
     public void createGameNegative() throws ResponseException {
-        CreateRequest createRequest = new CreateRequest("DifferentGame");
+        CreateRequest createRequest = new CreateRequest("BadGame");
         Assertions.assertThrows(ResponseException.class, () -> facade.createGame(createRequest));
     }
 
