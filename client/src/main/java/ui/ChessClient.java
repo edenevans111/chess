@@ -133,11 +133,16 @@ public class ChessClient {
 
         if(args.length < 1){
             createString.append("Need to supply a game name (name must be one word) ");
+        } else {
+            try{
+                String gameName = args[0];
+                CreateRequest request = new CreateRequest(gameName);
+                CreateResponse response = serverFacade.createGame(request);
+                createString.append("You have successfully created game: " + gameName);
+            } catch (ResponseException e){
+                createString.append("Unable to create game");
+            }
         }
-        String gameName = args[0];
-        CreateRequest request = new CreateRequest(gameName);
-        CreateResponse response = serverFacade.createGame(request);
-        createString.append("You have successfully created game: " + gameName);
         return createString.toString();
     }
 
@@ -146,7 +151,8 @@ public class ChessClient {
         ListRequest request = new ListRequest();
         ListResponse response = serverFacade.listGames(request);
         for(GameData game : response.games()){
-            listString.append(game.gameID() + " : " + game.gameName() + "\n");
+            listString.append(game.gameID() + " : " + game.gameName() + "White Player: "
+                    + game.whiteUsername() + "Black Player: " + game.blackUsername() + "\n");
         }
         return listString.toString();
     }
@@ -160,20 +166,24 @@ public class ChessClient {
             ChessGame.TeamColor teamColor;
             if(args[0].toLowerCase().equals("white")){
                 teamColor = ChessGame.TeamColor.WHITE;
-                ChessGame game = new ChessGame();
-                BoardDisplay display = new ChessBoardPrinter();
-                display.displayWhiteBoard(game);
             } else {
                 teamColor = ChessGame.TeamColor.BLACK;
+            }
+            try{
+                int gameID = Integer.parseInt(args[1]);
+                JoinRequest request = new JoinRequest(teamColor, gameID);
+                JoinResponse response = serverFacade.join(request);
+                joinString.append("Now joining game " + gameID);
                 ChessGame game = new ChessGame();
                 BoardDisplay display = new ChessBoardPrinter();
-                display.displayBlackBoard(game);
+                if(teamColor == ChessGame.TeamColor.WHITE){
+                    display.displayWhiteBoard(game);
+                } else{
+                    display.displayBlackBoard(game);
+                }
+            } catch (ResponseException e){
+                joinString.append("Unable to join game");
             }
-            // need to have try catch block here for integers
-            int gameID = Integer.parseInt(args[1]);
-            JoinRequest request = new JoinRequest(teamColor, gameID);
-            JoinResponse response = serverFacade.join(request);
-            joinString.append("Now joining game " + gameID);
         }
         return joinString.toString();
     }
