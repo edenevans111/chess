@@ -83,8 +83,8 @@ public class ServerFacadeTests {
 
     @Test
     public void joinGamePositive() throws ResponseException {
-        LoginRequest request = new LoginRequest("eden", "eden");
-        LoginResponse response = facade.login(request);
+        RegisterRequest registerRequest = new RegisterRequest("AnotherNewbie", "password", "email");
+        RegisterResponse registerResponse = facade.register(registerRequest);
 
         CreateRequest createRequest = new CreateRequest("CoolestGame");
         CreateResponse createResponse = facade.createGame(createRequest);
@@ -96,8 +96,8 @@ public class ServerFacadeTests {
 
     @Test
     public void joinGameNegative() throws ResponseException {
-        LoginRequest request = new LoginRequest("eden", "eden");
-        LoginResponse response = facade.login(request);
+        RegisterRequest registerRequest = new RegisterRequest("newUser", "password", "email");
+        RegisterResponse registerResponse = facade.register(registerRequest);
 
         JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.BLACK, 6);
         Assertions.assertThrows(ResponseException.class, () -> facade.join(joinRequest));
@@ -105,7 +105,7 @@ public class ServerFacadeTests {
 
     @Test
     public void createGamePositive() throws ResponseException {
-        RegisterRequest request = new RegisterRequest("username90", "password2", "email2@email.com");
+        RegisterRequest request = new RegisterRequest("username38", "password2", "email2@email.com");
         RegisterResponse response = facade.register(request);
 
         CreateRequest createRequest = new CreateRequest("AnotherGame");
@@ -127,6 +127,8 @@ public class ServerFacadeTests {
         ListRequest listRequest = new ListRequest();
         ListResponse listResponse = facade.listGames(listRequest);
         Assertions.assertNotNull(listResponse);
+        LogoutRequest logoutRequest = new LogoutRequest();
+        facade.logout(logoutRequest);
     }
 
     @Test
