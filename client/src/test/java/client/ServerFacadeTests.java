@@ -1,10 +1,11 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
-import request.LoginRequest;
-import request.LogoutRequest;
-import request.RegisterRequest;
+import request.*;
+import response.CreateResponse;
+import response.JoinResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import server.Server;
@@ -82,12 +83,24 @@ public class ServerFacadeTests {
 
     @Test
     public void joinGamePositive() throws DataAccessException {
+        LoginRequest request = new LoginRequest("eden", "eden");
+        LoginResponse response = facade.login(request);
 
+        CreateRequest createRequest = new CreateRequest("CoolestGame");
+        CreateResponse createResponse = facade.createGame(createRequest);
+
+        JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.WHITE, createResponse.gameID());
+        JoinResponse joinResponse = facade.join(joinRequest);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void joinGameNegative() throws DataAccessException {
+        LoginRequest request = new LoginRequest("eden", "eden");
+        LoginResponse response = facade.login(request);
 
+        JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.BLACK, 6);
+        Assertions.assertThrows(DataAccessException.class, () -> facade.join(joinRequest));
     }
 
     @Test
@@ -97,7 +110,7 @@ public class ServerFacadeTests {
 
     @Test
     public void createGameNegative() throws DataAccessException {
-
+        // not logged in
     }
 
     @Test
@@ -107,6 +120,6 @@ public class ServerFacadeTests {
 
     @Test
     public void listGamesNegative() throws DataAccessException {
-
+        // also not logged in
     }
 }

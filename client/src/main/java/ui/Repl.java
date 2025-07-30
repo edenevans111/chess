@@ -12,8 +12,6 @@ public class Repl implements MessagePrinter{
 
     ChessClient client = new ChessClient("http://localhost:8080");
 
-    // I should have three different repl loops (prelogin, postlogin)
-
     public void run(){
         System.out.println(SET_TEXT_COLOR_WHITE + "Welcome to Eden's Chess Game. Please login to start playing");
         System.out.print(client.help());

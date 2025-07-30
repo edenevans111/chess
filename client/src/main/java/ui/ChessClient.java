@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import dataaccess.DataAccessException;
+import dataaccess.SQLGameDAO;
 import model.GameData;
 import request.*;
 import response.*;
@@ -15,6 +16,7 @@ public class ChessClient {
     private String serverUrl;
     private ServerFacade serverFacade;
     private boolean isLoggedIn = false;
+    SQLGameDAO gameDAO;
 
     // I need to ask about how to make the server.ServerFacade object
     // I cannot figure out how to make it correctly for whatever reason
@@ -142,19 +144,20 @@ public class ChessClient {
             ChessGame.TeamColor teamColor;
             if(args[0].toLowerCase().equals("white")){
                 teamColor = ChessGame.TeamColor.WHITE;
-                BoardDisplay display = new ChessBoardPrinter();
-                ChessGame game = new ChessGame();
-                display.displayWhiteBoard(game);
             } else {
                 teamColor = ChessGame.TeamColor.BLACK;
-                BoardDisplay display = new ChessBoardPrinter();
-                ChessGame game = new ChessGame();
-                display.displayBlackBoard(game);
             }
             int gameID = Integer.parseInt(args[1]);
             JoinRequest request = new JoinRequest(teamColor, gameID);
             JoinResponse response = serverFacade.join(request);
-            joinString.append("Now joining game" + gameID);
+            GameData gameData = gameDAO.getGame(gameID);
+            BoardDisplay display = new ChessBoardPrinter();
+            if(teamColor == ChessGame.TeamColor.WHITE){
+                display.displayWhiteBoard(gameData.game());
+            } else {
+                display.displayBlackBoard(gameData.game());
+            }
+            joinString.append("Now joining game " + gameID);
         }
         return joinString.toString();
     }
