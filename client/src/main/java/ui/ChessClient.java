@@ -48,31 +48,44 @@ public class ChessClient {
             helpString.append("Register: supply username, password, email to create an account\n");
             helpString.append("Login: username and password to login to account\n");
             helpString.append("Quit: exit the program\n");
+            helpString.append("Help: commands that can be given");
         } else {
             helpString.append("Logout\n");
-            helpString.append("Create: supply name for a new chess game \n");
+            helpString.append("Create: supply name for a new chess game (name must be one word) \n");
             helpString.append("List: get a list of all the current games\n");
             helpString.append("Play: request to play a certain game using the game ID\n");
             helpString.append("Observe: indicate a game you would wish to watch\n");
+            helpString.append("Help: commands that can be given");
         }
 
         return helpString.toString();
     }
 
     public String login(String [] args) throws ResponseException {
-        String username = args[0];
-        String password = args[1];
         StringBuilder loginString = new StringBuilder();
-        if(password.isBlank()){
-            loginString.append("No password was given");
-        } else if (username.isBlank()){
-            loginString.append("No username was given");
+        if(args.length != 2){
+            loginString.append("Error, wrong information given: need username and password");
         } else {
-            LoginRequest request = new LoginRequest(username, password);
-            LoginResponse response = serverFacade.login(request);
-            loginString.append("Congratulations, you are logged in as " + response.username());
-            isLoggedIn = true;
+            String username = args[0];
+            String password = args[1];
+
+            if(password.isBlank()){
+                loginString.append("No password was given");
+            } else if (username.isBlank()){
+                loginString.append("No username was given");
+            } else {
+                try{
+                    LoginRequest request = new LoginRequest(username, password);
+                    LoginResponse response = serverFacade.login(request);
+                    loginString.append("Congratulations, you are logged in as " + response.username());
+                    isLoggedIn = true;
+                } catch (ResponseException e){
+                    loginString.append("Invalid Login given");
+                }
+
+            }
         }
+
         return loginString.toString();
     }
 
@@ -106,7 +119,7 @@ public class ChessClient {
         LogoutRequest request = new LogoutRequest();
         serverFacade.logout(request);
         logoutString.append("You are now logged out");
-
+        isLoggedIn = false;
         return logoutString.toString();
     }
 
@@ -151,6 +164,7 @@ public class ChessClient {
                 BoardDisplay display = new ChessBoardPrinter();
                 display.displayBlackBoard(game);
             }
+            // need to have try catch block here for integers
             int gameID = Integer.parseInt(args[1]);
             JoinRequest request = new JoinRequest(teamColor, gameID);
             JoinResponse response = serverFacade.join(request);
@@ -165,6 +179,9 @@ public class ChessClient {
         if(args.length < 1){
             observeString.append("Need to specify a game");
         } else {
+            // need to just check that the gameID is valid and then display board from white perspective
+            // check that the gameID is in the list of games
+            // get rid of the join request
             int gameID = Integer.parseInt(args[0]);
             JoinRequest request = new JoinRequest(null, gameID);
             JoinResponse response = serverFacade.join(request);

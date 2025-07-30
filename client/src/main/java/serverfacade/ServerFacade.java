@@ -93,7 +93,7 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw new IOException("IOException happened for some reason " + status);
+                    throw new IOException("Error: invalid");
                 }
             }
             throw new ResponseException("Error: something went wrong..." + status);
