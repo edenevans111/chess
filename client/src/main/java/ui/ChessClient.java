@@ -8,6 +8,7 @@ import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public class ChessClient {
     // handles all the logic for the Repl parameters
@@ -174,7 +175,16 @@ public class ChessClient {
                 JoinRequest request = new JoinRequest(teamColor, gameID);
                 JoinResponse response = serverFacade.join(request);
                 joinString.append("Now joining game " + gameID);
-                ChessGame game = new ChessGame();
+                // to get the right game to display
+                ChessGame game = null;
+                ListRequest listRequest = new ListRequest();
+                ListResponse listResponse = serverFacade.listGames(listRequest);
+                Collection<GameData> games = listResponse.games();
+                for (GameData gameData : games){
+                    if(gameData.gameID() == gameID){
+                        game = gameData.game();
+                    }
+                }
                 BoardDisplay display = new ChessBoardPrinter();
                 if(teamColor == ChessGame.TeamColor.WHITE){
                     display.displayWhiteBoard(game);
@@ -183,6 +193,8 @@ public class ChessClient {
                 }
             } catch (ResponseException e){
                 joinString.append("Unable to join game");
+            } catch (NumberFormatException e){
+                joinString.append("Need to give number");
             }
         }
         return joinString.toString();
@@ -191,21 +203,34 @@ public class ChessClient {
     private String observeGame(String [] args) throws ResponseException {
         StringBuilder observeString = new StringBuilder();
 
-        if(args.length < 1){
+        if(args.length != 1){
             observeString.append("Need to specify a game");
         } else {
-            // need to just check that the gameID is valid and then display board from white perspective
-            // check that the gameID is in the list of games
-            // get rid of the join request
-            int gameID = Integer.parseInt(args[0]);
-            JoinRequest request = new JoinRequest(null, gameID);
-            JoinResponse response = serverFacade.join(request);
-            observeString.append("You are now joining game: " + gameID);
-            BoardDisplay boardDisplay = new ChessBoardPrinter();
-            ChessGame game = new ChessGame();
-            boardDisplay.displayWhiteBoard(game);
+            try{
+                int gameID = Integer.parseInt(args[0]);
+                ListRequest listRequest = new ListRequest();
+                ListResponse listResponse = serverFacade.listGames(listRequest);
+                Collection<GameData> games = listResponse.games();
+                boolean hasGame = false;
+                ChessGame actualGame = null;
+                for(GameData game : games){
+                    if (game.gameID() == gameID){
+                        hasGame = true;
+                        actualGame = game.game();
+                        break;
+                    }
+                }
+                if(hasGame){
+                    observeString.append("You are now joining game: " + gameID);
+                    BoardDisplay boardDisplay = new ChessBoardPrinter();
+                    boardDisplay.displayWhiteBoard(actualGame);
+                } else {
+                    observeString.append("Game was not found");
+                }
+            } catch (NumberFormatException e){
+                observeString.append("need to give a number");
+            }
         }
-
         return observeString.toString();
     }
 

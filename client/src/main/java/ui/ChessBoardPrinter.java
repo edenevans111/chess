@@ -26,7 +26,7 @@ public class ChessBoardPrinter implements BoardDisplay{
             printRow(startWhite, i, game, true);
         }
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "    h " +
-                " g " + " f " + " e " + " d " + " c " + " b " + " a " + "   " + RESET_BG_COLOR);
+                " g " + " f " + " e " + " d " + " c " + " b " + " a " + "   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
 
     }
 
@@ -43,7 +43,7 @@ public class ChessBoardPrinter implements BoardDisplay{
             printRow(startWhite, i, game, false);
         }
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "    a " +
-                " b " + " c " + " d " + " e " + " f " + " g " + " h " + "   " + RESET_BG_COLOR);
+                " b " + " c " + " d " + " e " + " f " + " g " + " h " + "   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
 
     private void printRow(boolean startWhite, int rowNum, ChessGame game, boolean reverseColumns){
