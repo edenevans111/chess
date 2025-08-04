@@ -175,7 +175,7 @@ public class ChessClient {
                 JoinRequest request = new JoinRequest(teamColor, gameID);
                 JoinResponse response = serverFacade.join(request);
                 joinString.append("Now joining game " + gameID);
-                // to get the right game to display
+
                 ChessGame game = null;
                 ListRequest listRequest = new ListRequest();
                 ListResponse listResponse = serverFacade.listGames(listRequest);
