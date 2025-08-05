@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import request.*;
 import response.*;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -27,6 +28,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.webSocket("/ws", WebSocketHandler);
         Spark.delete("/db", this::deleteEverything);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::login);
