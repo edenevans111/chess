@@ -15,11 +15,14 @@ public class Server {
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
+    private final WebSocketHandler webSocketHandler;
+
 
     public Server() {
         this.userDAO = new SQLUserDAO();
         this.authDAO = new SQLAuthDAO();
         this.gameDAO = new SQLGameDAO();
+        this.webSocketHandler = new WebSocketHandler();
     }
 
     public int run(int desiredPort) {
@@ -28,7 +31,8 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.webSocket("/ws", WebSocketHandler);
+        // will need to fix the WebSocket thing here that is evidently now working
+        Spark.webSocket("/ws", webSocketHandler);
         Spark.delete("/db", this::deleteEverything);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::login);

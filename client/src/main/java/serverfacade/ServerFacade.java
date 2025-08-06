@@ -52,6 +52,8 @@ public class ServerFacade {
         return this.makeRequest("GET", path, null, ListResponse.class);
     }
 
+    // I think here I will need to add some more functions that go to the websocket...
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException{
         try {
             URL url = (new URI(serverUrl + path)).toURL();
