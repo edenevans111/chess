@@ -12,6 +12,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import javax.management.Notification;
@@ -89,9 +90,10 @@ public class WebSocketHandler {
 
     public void sendError(String username, int gameID, String message){
         try {
-
-        } catch (IOException e){
-            sendError(username, gameID, message);
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            connections.singleMessage(username, errorMessage);
+        } catch (IOException e) {
+            sendError(username, gameID, e.getMessage());
         }
     }
 }
