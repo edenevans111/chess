@@ -29,7 +29,6 @@ public class ChessBoardPrinter implements BoardDisplay{
         }
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "    h " +
                 " g " + " f " + " e " + " d " + " c " + " b " + " a " + "   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
-
     }
 
     @Override

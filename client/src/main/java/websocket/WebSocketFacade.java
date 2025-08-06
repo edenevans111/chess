@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.sun.nio.sctp.NotificationHandler;
 import serverfacade.ResponseException;
 import ui.BoardDisplay;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -38,11 +40,21 @@ public class WebSocketFacade extends Endpoint {
                    switch(messageType){
                        case NOTIFICATION -> {
                            NotificationMessage notificationMessage = new Gson().fromJson(s, NotificationMessage.class);
-                           // need to display the message using board display
+                           boardDisplay.displayMessage(notificationMessage.toString());
+                       }
+                       case ERROR -> {
+                           ErrorMessage errorMessage = new Gson().fromJson(s, ErrorMessage.class);
+                           boardDisplay.displayMessage(errorMessage.toString());
+                       }
+                       case LOAD_GAME -> {
+                           LoadGameMessage loadGameMessage = new Gson().fromJson(s, LoadGameMessage.class);
+                           if(loadGameMessage.shouldDisplayWhite()){
+                               boardDisplay.displayWhiteBoard(loadGameMessage.getGame());
+                           } else {
+                               boardDisplay.displayBlackBoard(loadGameMessage.getGame());
+                           }
                        }
                    }
-                   Notification notification = new Gson().fromJson(s, Notification.class);
-                   notificationHandler.notify();
                }
            });
        } catch (DeploymentException | IOException | URISyntaxException e){
