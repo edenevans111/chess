@@ -31,7 +31,6 @@ public class SQLGameDAO extends SQLDatabase implements GameDAO{
         executeUpdate(statement);
     }
 
-    // I might need to change this so that it just takes in the gameData object instead of all the random stuff...
     @Override
     public int createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
         String statement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
