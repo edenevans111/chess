@@ -11,8 +11,10 @@ import static ui.EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
 
 public class ChessBoardPrinter implements BoardDisplay{
 
-    private final String bunchOfSpaces = EMPTY + EMPTY + EMPTY + EMPTY + EMPTY + EMPTY;
-    private final String fewerSpaces = EMPTY + EMPTY + EMPTY;
+    @Override
+    public void displayMessage(String message){
+        System.out.println(message);
+    }
 
     @Override
     public void displayBlackBoard(ChessGame game) {
