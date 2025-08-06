@@ -33,11 +33,15 @@ public class WebSocketHandler {
     private final AuthDAO authDAO;
     private final GameService gameService;
 
-    public WebSocketHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) throws DataAccessException {
+    public WebSocketHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO){
         this.gameDAO = gameDAO;
         this.userDAO = userDAO;
         this.authDAO = authDAO;
-        this.gameService = new GameService(userDAO, authDAO, gameDAO);
+        try {
+            this.gameService = new GameService(userDAO, authDAO, gameDAO);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     
@@ -84,7 +88,7 @@ public class WebSocketHandler {
                 connections.broadcast(gameID, username, notificationMessage);
                 ChessGame chessGame = gameData.game();
                 LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame, displayWhite);
-                connections.singleMessage(gameID, username, gameMessage);
+                connections.broadcast(gameID, username, gameMessage);
             } catch (Exception e){
                 sendError(username, gameID, e.getMessage());
             }

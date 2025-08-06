@@ -18,15 +18,13 @@ public class Server {
     private final WebSocketHandler webSocketHandler;
 
 
-    public Server() throws DataAccessException {
-        try {
-            this.userDAO = new SQLUserDAO();
-            this.authDAO = new SQLAuthDAO();
-            this.gameDAO = new SQLGameDAO();
-            this.webSocketHandler = new WebSocketHandler(userDAO, authDAO, gameDAO);
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error: this didn't work for some reason");
-        }
+    public Server() {
+
+        this.userDAO = new SQLUserDAO();
+        this.authDAO = new SQLAuthDAO();
+        this.gameDAO = new SQLGameDAO();
+        this.webSocketHandler = new WebSocketHandler(userDAO, authDAO, gameDAO);
+
 
     }
 
