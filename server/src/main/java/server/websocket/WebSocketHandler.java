@@ -43,6 +43,11 @@ public class WebSocketHandler {
         String username;
         String authToken = command.getAuthToken();
         AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null){
+            connections.add(command.getGameID(), null, session);
+            String errorMessage = "Error: invalid user";
+            sendError(null, command.getGameID(), errorMessage);
+        }
         username = authData.username();
         MakeMoveCommand command1 = null;
         if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
@@ -69,6 +74,7 @@ public class WebSocketHandler {
         try {
             gameData = gameDAO.getGame(gameID);
         } catch (DataAccessException e){
+            connections.add(gameID, username, session);
             String message = String.format("There is no game %d", gameID);
             sendError(username, gameID, message);
             return;
@@ -194,7 +200,7 @@ public class WebSocketHandler {
     public void sendError(String username, int gameID, String message){
         try {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
-            connections.broadcast(gameID, null, errorMessage);
+            connections.singleMessage(gameID, username, errorMessage);
         } catch (IOException e) {
             sendError(username, gameID, e.getMessage());
         }
