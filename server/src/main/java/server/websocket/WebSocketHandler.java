@@ -134,6 +134,10 @@ public class WebSocketHandler {
         }
         if(isValid){
             game.makeMove(move);
+        } else {
+            String errorMessage = "Invalid move";
+            sendError(username, gameID, errorMessage);
+            return;
         }
         boolean displayWhite = true;
         boolean isStalemate;
