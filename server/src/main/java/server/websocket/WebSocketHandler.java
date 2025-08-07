@@ -56,23 +56,25 @@ public class WebSocketHandler {
         if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
             command1 = new Gson().fromJson(message, MakeMoveCommand.class);
         }
+        GameData gameData = gameDAO.getGame(command.getGameID());
+        ChessGame game = gameData.game();
         switch(command.getCommandType()){
-            case CONNECT -> connect(username, command.getGameID(), session);
+            case CONNECT -> connect(username, command.getGameID(), session, game);
             case MAKE_MOVE -> {
                 try{
-                    makeMove(username, command1.getGameID(), command1.getMove());
+                    makeMove(username, command1.getGameID(), command1.getMove(), game);
                 } catch (DataAccessException | InvalidMoveException e) {
                     throw new RuntimeException(e);
                 }
                 break;
             }
             case LEAVE -> leaveGame(username, command.getGameID());
-            case RESIGN -> resign(username, command.getGameID());
+            case RESIGN -> resign(username, command.getGameID(), game);
         }
         System.out.print("End of onMessage function");
     }
 
-    public void connect(String username, int gameID, Session session) throws IOException {
+    public void connect(String username, int gameID, Session session, ChessGame game) throws IOException {
         GameData gameData = null;
         try {
             gameData = gameDAO.getGame(gameID);
@@ -106,9 +108,7 @@ public class WebSocketHandler {
                 NotificationMessage notificationMessage =
                         new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(gameID, username, notificationMessage);
-                ChessGame chessGame = gameData.game();
-                LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame, displayWhite);
-                //connections.broadcast(gameID, null, loadGameMessage);
+                LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, displayWhite);
                 connections.singleMessage(gameID, username, loadGameMessage);
             } catch (Exception e){
                 sendError(username, gameID, e.getMessage());
@@ -116,9 +116,8 @@ public class WebSocketHandler {
         }
     }
 
-    public void makeMove(String username, int gameID, ChessMove move) throws IOException, DataAccessException, InvalidMoveException {
+    public void makeMove(String username, int gameID, ChessMove move, ChessGame game) throws IOException, DataAccessException, InvalidMoveException {
         GameData gameData = gameDAO.getGame(gameID);
-        ChessGame game = gameData.game();
         if(!username.equals(gameData.whiteUsername()) || !username.equals(gameData.blackUsername())){
             String message = "You are not authorized to make any moves";
             sendError(username, gameID, message);
@@ -202,10 +201,9 @@ public class WebSocketHandler {
         connections.remove(gameID, username);
     }
 
-    public void resign(String username, int gameID) throws IOException, DataAccessException {
+    public void resign(String username, int gameID, ChessGame game) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(gameID);
-        ChessGame chessGame = gameData.game();
-        chessGame.setIsOverTrue();
+        game.setIsOverTrue();
         String message;
         if(gameData.whiteUsername().equals(username)){
             message = String.format("%s has resigned. Black Player: %s wins", username, gameData.blackUsername());
