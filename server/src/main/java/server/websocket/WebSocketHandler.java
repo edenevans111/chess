@@ -71,12 +71,16 @@ public class WebSocketHandler {
         if (gameData != null){
             try {
                 boolean displayWhite = true;
-                if(gameData.blackUsername().equals(username)){
-                    displayWhite = false;
+                // check that black username is not null
+                if (gameData.blackUsername() != null){
+                    if (gameData.blackUsername().equals(username)){
+                        displayWhite = false;
+                    }
                 }
                 connections.add(gameID, username, session);
                 String message;
-                if(gameData.whiteUsername().equals(username)){
+                // need to find a way to handle the null cases
+                if(gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)){
                     message = String.format("%s has joined game %d as the WHITE player", username, gameID);
                 } else if (!displayWhite){
                     message = String.format("%s has joined game %d as the BLACK player", username, gameID);
