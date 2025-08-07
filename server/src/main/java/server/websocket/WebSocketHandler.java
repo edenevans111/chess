@@ -143,23 +143,21 @@ public class WebSocketHandler {
             isCheck = game.isInCheck(ChessGame.TeamColor.WHITE);
             isCheckmate = game.isInCheckmate(ChessGame.TeamColor.WHITE);
         }
-        LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, displayWhite);
+        LoadGameMessage loadGameMessage =
+                new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, displayWhite);
         String notification = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
-        NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
-        // if(isInCheck || isInCheckMate || isStalement) sends NotificationMessage to everyone-make sure to indicate
-        if(isStalemate){
-            String message = "The game is in a Stalemate";
-            NotificationMessage notificationMessage1 =
-                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(gameID, username, notificationMessage1);
-        } else if (isCheck){
-            String message = String.format("%s is in Check", username);
-            NotificationMessage notificationMessage1 =
-                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(gameID, username, notificationMessage1);
+        NotificationMessage notificationMessage =
+                new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        if(isCheck || isCheckmate || isStalemate){
+            String message;
+            if(isStalemate){
+                message = "The game is in a Stalemate";
+            } else if (isCheck){
+                message = String.format("%s is in Check", username);
 
-        } else if (isCheckmate){
-            String message = String.format("%s is in Checkmate", username);
+            } else {
+                message = String.format("%s is in Checkmate", username);
+            }
             NotificationMessage notificationMessage1 =
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(gameID, username, notificationMessage1);
