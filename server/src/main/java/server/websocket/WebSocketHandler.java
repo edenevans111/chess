@@ -119,6 +119,11 @@ public class WebSocketHandler {
     public void makeMove(String username, int gameID, ChessMove move) throws IOException, DataAccessException, InvalidMoveException {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
+        if(!username.equals(gameData.whiteUsername()) || !username.equals(gameData.blackUsername())){
+            String message = "You are not authorized to make any moves";
+            sendError(username, gameID, message);
+            return;
+        }
         if (game.getIsOver()){
             String message = String.format("%d is over, you cannot make any moves", gameID);
             sendError(username, gameID, message);
