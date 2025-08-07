@@ -147,9 +147,19 @@ public class WebSocketHandler {
         String notification = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
         // if(isInCheck || isInCheckMate || isStalement) sends NotificationMessage to everyone-make sure to indicate
-        if(isCheck || isCheckmate || isStalemate){
-            String message = "The game is in Check, Checkmate, or a Stalemate";
-            NotificationMessage notificationMessage1 = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        if(isStalemate){
+            String message = "The game is in a Stalemate";
+            NotificationMessage notificationMessage1 =
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        } else if (isCheck){
+            String message = String.format("%s is in Check", username);
+            NotificationMessage notificationMessage1 =
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+
+        } else if (isCheckmate){
+            String message = String.format("%s is in Checkmate", username);
+            NotificationMessage notificationMessage1 =
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         }
     }
 
