@@ -54,9 +54,9 @@ public class WebSocketHandler {
 
         switch(command.getCommandType()){
             case CONNECT -> connect(username, command.getGameID(), session);
-            case MAKE_MOVE -> makeMove(command.getAuthToken());
-            case LEAVE -> leaveGame(command.getAuthToken());
-            case RESIGN -> resign(command.getAuthToken());
+            case MAKE_MOVE -> makeMove(username, command.getGameID());
+            case LEAVE -> leaveGame(username, command.getGameID());
+            case RESIGN -> resign(username, command.getGameID());
         }
     }
 
@@ -99,24 +99,48 @@ public class WebSocketHandler {
         }
     }
 
-    public void makeMove(String authToken) throws IOException {
-        // I think this one honestly needs to be substantially different...
-        ServerMessage notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        ServerMessage loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        // connections.broadcast(authToken, notification.getServerMessageType());
-        // connections.broadcast(authToken, loadGame.getServerMessageType());
+    public void makeMove(String username, int gameID) throws IOException, DataAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
+        ChessGame game = gameData.game();
+        // validate the move (see if it's in the possibleMoves)
+        // Game is updated with the move
+        // LoadGameMessage with the new move to all the clients of the game
+        // NotificationMessage with the move is sent to everyone
+        // if(isInCheck || isInCheckMate || isStalement) sends NotificationMessage to everyone
     }
 
-    public void leaveGame(String authToken) throws IOException {
-        connections.remove(authToken);
-        var message = String.format("%s has left the game", authToken);
-        //connections.broadcast(authToken, ServerMessage.ServerMessageType.NOTIFICATION);
+    public void leaveGame(String username, int gameID) throws IOException, DataAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
+        String message;
+        if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
+            message = String.format("%s has left the game. They were the BLACK player", username);
+        } else if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)){
+            message = String.format("%s has left the game. They were the WHITE player", username);
+        } else {
+            message = String.format("%s has left the game. They were an OBSERVER", username);
+        }
+        NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(gameID, username, notification);
+        connections.remove(gameID, username);
     }
 
-    public void resign(String authToken) throws IOException {
-        connections.remove(authToken);
-        // I am pretty sure I am actually supposed to remove everyone...?
-        // connections.broadcast(authToken, ServerMessage.ServerMessageType.NOTIFICATION);
+    public void resign(String username, int gameID) throws IOException, DataAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
+        // need to mark the game as over
+        // Game is updated in the database
+        // Server sends a message to all the clients that the game is over
+        String message;
+        if(gameData.whiteUsername().equals(username)){
+            message = String.format("%s has resigned. Black Player: %s wins", username, gameData.blackUsername());
+        } else if (gameData.blackUsername().equals(username)){
+            message = String.format("%s has resigned. Black Player: %s wins", username, gameData.whiteUsername());
+        } else {
+            message = "Not a player, cannot resign from game";
+            sendError(username, gameID, message);
+        }
+        NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(gameID, username, notificationMessage);
+        // then I somehow need to close the connection for all the players
     }
 
     public void sendError(String username, int gameID, String message){

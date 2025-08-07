@@ -1,5 +1,6 @@
 package server.websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -39,7 +40,8 @@ public class ConnectionManager {
             if(c.session.isOpen()){
                 // I might need to add a check here for in case the username is null...
                 if(!c.username.equals(excludeUsername)){
-                    c.send(serverMessage.toString());
+                    String json = new Gson().toJson(serverMessage);
+                    c.send(json);
                 }
             } else {
                 removeList.add(c);
@@ -51,18 +53,21 @@ public class ConnectionManager {
     }
 
     public void singleMessage(int gameID, String excludeUsername, ServerMessage message) throws IOException {
+        HashMap<String, Connection> relevantConnections = connections.get(gameID);
         var removeList = new ArrayList<Connection>();
-        for(var c : connections.values()){
-            if(c.session.isOpen()){
-                if(c.username.equals(excludeUsername)){
-                    c.send(message.toString());
+        for (var c : relevantConnections.values()) {
+            if (c.session.isOpen()) {
+                // I might need to add a check here for in case the username is null...
+                if (c.username.equals(excludeUsername)) {
+                    String json = new Gson().toJson(message);
+                    c.send(json);
                 }
             } else {
                 removeList.add(c);
             }
         }
-        for(var c : removeList){
-            connections.remove(c.username);
+        for (var c : removeList) {
+            relevantConnections.remove(c.username);
         }
     }
 }
