@@ -70,4 +70,11 @@ public class ConnectionManager {
             relevantConnections.remove(c.username);
         }
     }
+
+    public void singleErrorMessage(Session session, ServerMessage message) throws IOException {
+        if(session.isOpen()){
+            String json = new Gson().toJson(message);
+            session.getRemote().sendString(json);
+        }
+    }
 }

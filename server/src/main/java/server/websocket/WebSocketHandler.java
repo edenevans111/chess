@@ -40,15 +40,18 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-        String username;
+        String username = null;
         String authToken = command.getAuthToken();
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null){
-            connections.add(command.getGameID(), null, session);
-            String errorMessage = "Error: invalid user";
-            sendError(null, command.getGameID(), errorMessage);
+        AuthData authData = null;
+        try {
+            authData = authDAO.getAuth(authToken);
+            username = authData.username();
+        } catch (Exception e) {
+            String errorMessage = "Invalid User";
+            badAuth(session, errorMessage);
+            return;
         }
-        username = authData.username();
+
         MakeMoveCommand command1 = null;
         if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
             command1 = new Gson().fromJson(message, MakeMoveCommand.class);
@@ -78,6 +81,10 @@ public class WebSocketHandler {
             String message = String.format("There is no game %d", gameID);
             sendError(username, gameID, message);
             return;
+        }
+        if(username == null){
+            String errorMessage = "Invalid user";
+
         }
         if (gameData != null){
             try {
@@ -203,6 +210,16 @@ public class WebSocketHandler {
             connections.singleMessage(gameID, username, errorMessage);
         } catch (IOException e) {
             sendError(username, gameID, e.getMessage());
+        }
+    }
+
+    public void badAuth (Session session, String message) {
+        try {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            connections.singleErrorMessage(session, errorMessage);
+        } catch (Exception e) {
+            // might need to change this later
+            throw new RuntimeException("Unable to use that authToken");
         }
     }
 }
