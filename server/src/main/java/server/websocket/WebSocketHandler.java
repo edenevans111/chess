@@ -66,7 +66,7 @@ public class WebSocketHandler {
             case MAKE_MOVE -> {
                 try{
                     makeMove(username, command1.getGameID(), command1.getMove());
-                } catch (DataAccessException e) {
+                } catch (DataAccessException | InvalidMoveException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -151,15 +151,18 @@ public class WebSocketHandler {
             String message = "The game is in a Stalemate";
             NotificationMessage notificationMessage1 =
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(gameID, username, notificationMessage1);
         } else if (isCheck){
             String message = String.format("%s is in Check", username);
             NotificationMessage notificationMessage1 =
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(gameID, username, notificationMessage1);
 
         } else if (isCheckmate){
             String message = String.format("%s is in Checkmate", username);
             NotificationMessage notificationMessage1 =
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(gameID, username, notificationMessage1);
         }
     }
 
