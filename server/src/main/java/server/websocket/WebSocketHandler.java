@@ -183,8 +183,12 @@ public class WebSocketHandler {
         String message;
         if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
             message = String.format("%s has left the game. They were the BLACK player", username);
+            GameData newGame = new GameData(gameID, gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
+            gameDAO.updateGame(newGame);
         } else if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)){
             message = String.format("%s has left the game. They were the WHITE player", username);
+            GameData newGame = new GameData(gameID, null, gameData.blackUsername(), gameData.gameName(), gameData.game());
+            gameDAO.updateGame(newGame);
         } else {
             message = String.format("%s has left the game. They were an OBSERVER", username);
         }
