@@ -49,10 +49,7 @@ public class WebSocketHandler {
             command1 = new Gson().fromJson(message, MakeMoveCommand.class);
         }
         switch(command.getCommandType()){
-            case CONNECT -> {
-                connect(username, command.getGameID(), session);
-                break;
-            }
+            case CONNECT -> connect(username, command.getGameID(), session);
             case MAKE_MOVE -> {
                 try{
                     makeMove(username, command1.getGameID(), command1.getMove());
@@ -61,14 +58,8 @@ public class WebSocketHandler {
                 }
                 break;
             }
-            case LEAVE -> {
-                leaveGame(username, command.getGameID());
-                break;
-            }
-            case RESIGN -> {
-                resign(username, command.getGameID());
-                break;
-            }
+            case LEAVE -> leaveGame(username, command.getGameID());
+            case RESIGN -> resign(username, command.getGameID());
         }
         System.out.print("End of onMessage function");
     }
@@ -85,7 +76,6 @@ public class WebSocketHandler {
         if (gameData != null){
             try {
                 boolean displayWhite = true;
-                // check that black username is not null
                 if (gameData.blackUsername() != null){
                     if (gameData.blackUsername().equals(username)){
                         displayWhite = false;
@@ -105,7 +95,8 @@ public class WebSocketHandler {
                 connections.broadcast(gameID, username, notificationMessage);
                 ChessGame chessGame = gameData.game();
                 LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame, displayWhite);
-                connections.broadcast(gameID, null, loadGameMessage);
+                //connections.broadcast(gameID, null, loadGameMessage);
+                connections.singleMessage(gameID, username, loadGameMessage);
             } catch (Exception e){
                 sendError(username, gameID, e.getMessage());
             }
@@ -113,7 +104,7 @@ public class WebSocketHandler {
     }
 
     public void makeMove(String username, int gameID, ChessMove move) throws IOException, DataAccessException, InvalidMoveException {
-        
+
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
         if (game.getIsOver()){
@@ -132,7 +123,6 @@ public class WebSocketHandler {
         if(isValid){
             game.makeMove(move);
         }
-        // now need to determine if the White or Black board should be displayed...
         boolean displayWhite = true;
         boolean isStalemate = false;
         boolean isCheck = false;
@@ -149,6 +139,7 @@ public class WebSocketHandler {
         }
         LoadGameMessage loadGameMessage =
                 new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, displayWhite);
+        connections.broadcast(gameID, null, loadGameMessage);
         String notification = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
         NotificationMessage notificationMessage =
                 new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
@@ -203,7 +194,7 @@ public class WebSocketHandler {
     public void sendError(String username, int gameID, String message){
         try {
             ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
-            connections.singleMessage(gameID, username, errorMessage);
+            connections.broadcast(gameID, null, errorMessage);
         } catch (IOException e) {
             sendError(username, gameID, e.getMessage());
         }
