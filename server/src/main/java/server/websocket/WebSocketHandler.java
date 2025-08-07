@@ -1,8 +1,6 @@
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.*;
@@ -12,6 +10,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -22,6 +21,7 @@ import javax.management.Notification;
 import javax.swing.*;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -48,13 +48,28 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-        String authToken = command.getAuthToken();
-        AuthData authData = authDAO.getAuth(authToken);
-        String username = authData.username();
+        String username;
+        MakeMoveCommand command1 = null;
+        if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
+            command1 = new Gson().fromJson(message, MakeMoveCommand.class);
+            String authToken = command1.getAuthToken();
+            AuthData authData = authDAO.getAuth(authToken);
+            username = authData.username();
+        } else {
+            String authToken = command.getAuthToken();
+            AuthData authData = authDAO.getAuth(authToken);
+            username = authData.username();
+        }
 
         switch(command.getCommandType()){
             case CONNECT -> connect(username, command.getGameID(), session);
-            case MAKE_MOVE -> makeMove(username, command.getGameID());
+            case MAKE_MOVE -> {
+                try{
+                    makeMove(username, command1.getGameID(), command1.getMove());
+                } catch (DataAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             case LEAVE -> leaveGame(username, command.getGameID());
             case RESIGN -> resign(username, command.getGameID());
         }
@@ -99,14 +114,43 @@ public class WebSocketHandler {
         }
     }
 
-    public void makeMove(String username, int gameID) throws IOException, DataAccessException {
+    public void makeMove(String username, int gameID, ChessMove move) throws IOException, DataAccessException, InvalidMoveException {
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
-        // validate the move (see if it's in the possibleMoves)
-        // Game is updated with the move
-        // LoadGameMessage with the new move to all the clients of the game
-        // NotificationMessage with the move is sent to everyone
-        // if(isInCheck || isInCheckMate || isStalement) sends NotificationMessage to everyone
+        Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
+        boolean isValid = false;
+        for(ChessMove potentialMove : validMoves){
+            if (potentialMove.getEndPosition() == move.getEndPosition()) {
+                isValid = true;
+                break;
+            }
+        }
+        if(isValid){
+            game.makeMove(move);
+        }
+        // now need to determine if the White or Black board should be displayed...
+        boolean displayWhite = true;
+        boolean isStalemate = false;
+        boolean isCheck = false;
+        boolean isCheckmate = false;
+        if(gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
+            displayWhite = false;
+            isStalemate = game.isInStalemate(ChessGame.TeamColor.BLACK);
+            isCheck = game.isInCheck(ChessGame.TeamColor.BLACK);
+            isCheckmate = game.isInCheckmate(ChessGame.TeamColor.BLACK);
+        } else {
+            isStalemate = game.isInStalemate(ChessGame.TeamColor.WHITE);
+            isCheck = game.isInCheck(ChessGame.TeamColor.WHITE);
+            isCheckmate = game.isInCheckmate(ChessGame.TeamColor.WHITE);
+        }
+        LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, displayWhite);
+        String notification = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
+        NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        // if(isInCheck || isInCheckMate || isStalement) sends NotificationMessage to everyone-make sure to indicate
+        if(isCheck || isCheckmate || isStalemate){
+            String message = "The game is in Check, Checkmate, or a Stalemate";
+            NotificationMessage notificationMessage1 = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        }
     }
 
     public void leaveGame(String username, int gameID) throws IOException, DataAccessException {
