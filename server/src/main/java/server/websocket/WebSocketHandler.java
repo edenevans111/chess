@@ -67,6 +67,7 @@ public class WebSocketHandler {
         } catch (DataAccessException e){
             String message = String.format("There is no game %d", gameID);
             sendError(username, gameID, message);
+            return;
         }
         if (gameData != null){
             try {
@@ -79,7 +80,6 @@ public class WebSocketHandler {
                 }
                 connections.add(gameID, username, session);
                 String message;
-                // need to find a way to handle the null cases
                 if(gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)){
                     message = String.format("%s has joined game %d as the WHITE player", username, gameID);
                 } else if (!displayWhite){
@@ -91,13 +91,12 @@ public class WebSocketHandler {
                         new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(gameID, username, notificationMessage);
                 ChessGame chessGame = gameData.game();
-                LoadGameMessage gameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame, displayWhite);
-                connections.broadcast(gameID, username, gameMessage);
+                LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame, displayWhite);
+                connections.broadcast(gameID, username, loadGameMessage);
             } catch (Exception e){
                 sendError(username, gameID, e.getMessage());
             }
         }
-
     }
 
     public void makeMove(String authToken) throws IOException {
