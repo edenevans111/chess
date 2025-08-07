@@ -127,14 +127,14 @@ public class WebSocketHandler {
         Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
         boolean isValid = false;
         for(ChessMove potentialMove : validMoves){
-            if (potentialMove.getEndPosition() == move.getEndPosition()) {
+            if (potentialMove.getEndPosition().equals(move.getEndPosition())) {
                 isValid = true;
                 break;
             }
         }
         if(isValid){
             game.makeMove(move);
-        } else {
+        }  else {
             String errorMessage = "Invalid move";
             sendError(username, gameID, errorMessage);
             return;
