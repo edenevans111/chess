@@ -14,6 +14,7 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard squares;
+    private boolean isOver = false;
 
     public ChessGame() {
         ChessBoard squares = new ChessBoard();
@@ -27,6 +28,14 @@ public class ChessGame {
      */
     public TeamColor getTeamTurn() {
         return teamTurn;
+    }
+
+    public boolean getIsOver(){
+        return isOver;
+    }
+
+    public void setIsOverTrue(){
+        isOver = true;
     }
 
     /**

@@ -28,20 +28,12 @@ import java.util.Objects;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
-    private final GameDAO gameDAO;
-    private final UserDAO userDAO;
-    private final AuthDAO authDAO;
-    private final GameService gameService;
+    private final GameDAO gameDAO = new SQLGameDAO();
+    private final UserDAO userDAO = new SQLUserDAO();
+    private final AuthDAO authDAO = new SQLAuthDAO();
 
-    public WebSocketHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO){
-        this.gameDAO = gameDAO;
-        this.userDAO = userDAO;
-        this.authDAO = authDAO;
-        try {
-            this.gameService = new GameService(userDAO, authDAO, gameDAO);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public WebSocketHandler() {
+
     }
 
     
@@ -49,30 +41,36 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         String username;
+        String authToken = command.getAuthToken();
+        AuthData authData = authDAO.getAuth(authToken);
+        username = authData.username();
         MakeMoveCommand command1 = null;
         if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
             command1 = new Gson().fromJson(message, MakeMoveCommand.class);
-            String authToken = command1.getAuthToken();
-            AuthData authData = authDAO.getAuth(authToken);
-            username = authData.username();
-        } else {
-            String authToken = command.getAuthToken();
-            AuthData authData = authDAO.getAuth(authToken);
-            username = authData.username();
         }
-
         switch(command.getCommandType()){
-            case CONNECT -> connect(username, command.getGameID(), session);
+            case CONNECT -> {
+                connect(username, command.getGameID(), session);
+                break;
+            }
             case MAKE_MOVE -> {
                 try{
                     makeMove(username, command1.getGameID(), command1.getMove());
                 } catch (DataAccessException | InvalidMoveException e) {
                     throw new RuntimeException(e);
                 }
+                break;
             }
-            case LEAVE -> leaveGame(username, command.getGameID());
-            case RESIGN -> resign(username, command.getGameID());
+            case LEAVE -> {
+                leaveGame(username, command.getGameID());
+                break;
+            }
+            case RESIGN -> {
+                resign(username, command.getGameID());
+                break;
+            }
         }
+        System.out.print("End of onMessage function");
     }
 
     public void connect(String username, int gameID, Session session) throws IOException {
@@ -107,7 +105,7 @@ public class WebSocketHandler {
                 connections.broadcast(gameID, username, notificationMessage);
                 ChessGame chessGame = gameData.game();
                 LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGame, displayWhite);
-                connections.broadcast(gameID, username, loadGameMessage);
+                connections.broadcast(gameID, null, loadGameMessage);
             } catch (Exception e){
                 sendError(username, gameID, e.getMessage());
             }
@@ -115,8 +113,14 @@ public class WebSocketHandler {
     }
 
     public void makeMove(String username, int gameID, ChessMove move) throws IOException, DataAccessException, InvalidMoveException {
+        
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
+        if (game.getIsOver()){
+            String message = String.format("%d is over, you cannot make any moves", gameID);
+            sendError(username, gameID, message);
+            return;
+        }
         Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
         boolean isValid = false;
         for(ChessMove potentialMove : validMoves){
@@ -181,9 +185,8 @@ public class WebSocketHandler {
 
     public void resign(String username, int gameID) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(gameID);
-        // need to mark the game as over
-        // Game is updated in the database
-        // Server sends a message to all the clients that the game is over
+        ChessGame chessGame = gameData.game();
+        chessGame.setIsOverTrue();
         String message;
         if(gameData.whiteUsername().equals(username)){
             message = String.format("%s has resigned. Black Player: %s wins", username, gameData.blackUsername());
@@ -195,7 +198,6 @@ public class WebSocketHandler {
         }
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(gameID, username, notificationMessage);
-        // then I somehow need to close the connection for all the players
     }
 
     public void sendError(String username, int gameID, String message){

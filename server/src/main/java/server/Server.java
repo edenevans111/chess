@@ -23,7 +23,7 @@ public class Server {
         this.userDAO = new SQLUserDAO();
         this.authDAO = new SQLAuthDAO();
         this.gameDAO = new SQLGameDAO();
-        this.webSocketHandler = new WebSocketHandler(userDAO, authDAO, gameDAO);
+        this.webSocketHandler = new WebSocketHandler();
 
 
     }
@@ -35,7 +35,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         // will need to fix the WebSocket thing here that is evidently now working
-        Spark.webSocket("/ws", webSocketHandler);
+        Spark.webSocket("/ws", WebSocketHandler.class);
         Spark.delete("/db", this::deleteEverything);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::login);
