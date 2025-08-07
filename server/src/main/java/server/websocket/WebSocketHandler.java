@@ -117,7 +117,6 @@ public class WebSocketHandler {
     }
 
     public void makeMove(String username, int gameID, ChessMove move) throws IOException, DataAccessException, InvalidMoveException {
-
         GameData gameData = gameDAO.getGame(gameID);
         ChessGame game = gameData.game();
         if (game.getIsOver()){
@@ -137,9 +136,9 @@ public class WebSocketHandler {
             game.makeMove(move);
         }
         boolean displayWhite = true;
-        boolean isStalemate = false;
-        boolean isCheck = false;
-        boolean isCheckmate = false;
+        boolean isStalemate;
+        boolean isCheck;
+        boolean isCheckmate;
         if(gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
             displayWhite = false;
             isStalemate = game.isInStalemate(ChessGame.TeamColor.BLACK);
@@ -156,15 +155,18 @@ public class WebSocketHandler {
         String notification = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
         NotificationMessage notificationMessage =
                 new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        connections.broadcast(gameID, username, notificationMessage);
         if(isCheck || isCheckmate || isStalemate){
             String message;
             if(isStalemate){
                 message = "The game is in a Stalemate";
+                game.setIsOverTrue();
             } else if (isCheck){
                 message = String.format("%s is in Check", username);
 
             } else {
                 message = String.format("%s is in Checkmate", username);
+                game.setIsOverTrue();
             }
             NotificationMessage notificationMessage1 =
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
