@@ -25,10 +25,17 @@ public class ChessClient {
     private GameData gameData = null;
     private String authToken = null;
     private String username = null;
+    private WebSocketFacade wsf;
 
-    public ChessClient(String serverUrl){
+    public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
         this.serverFacade = new ServerFacade(serverUrl);
+        BoardDisplay boardDisplay = new ChessBoardPrinter();
+        try {
+            this.wsf = new WebSocketFacade(serverUrl, boardDisplay);
+        } catch (ResponseException e) {
+            throw new RuntimeException("Unable to make the WebSocketFacade");
+        }
     }
 
     public String eval(String line) throws ResponseException {
@@ -220,6 +227,8 @@ public class ChessClient {
             }
         }
         return joinString.toString();
+
+        // In addition to all of this, I also need to make a boardDisplay with a message
     }
 
     private String observeGame(String [] args) throws ResponseException {
@@ -254,6 +263,37 @@ public class ChessClient {
             }
         }
         return observeString.toString();
+    }
+
+    public String leave() throws ResponseException {
+        StringBuilder leaveMessage = new StringBuilder();
+        if(!isObserver || !inGameplay){
+            throw new RuntimeException("You need to be in a game to leave");
+        }
+
+        if(isObserver){
+            isObserver = false;
+            leaveMessage.append("You have left the game and are no longer observing");
+
+
+        } else {
+            leaveMessage.append("You are leaving the game as a player");
+        }
+        UserGameCommand leaveRequest = new UserGameCommand(UserGameCommand.CommandType.LEAVE,
+                authToken, gameData.gameID());
+
+
+        return leaveMessage.toString();
+    }
+
+
+    public void redrawChessBoard() {
+        BoardDisplay boardDisplay = new ChessBoardPrinter();
+        if(displayWhite){
+            boardDisplay.displayWhiteBoard(gameData.game());
+        } else {
+            boardDisplay.displayBlackBoard(gameData.game());
+        }
     }
 
 }
