@@ -43,6 +43,7 @@ public class WebSocketHandler {
         String username = null;
         String authToken = command.getAuthToken();
         AuthData authData = null;
+        // validate the authToken
         try {
             authData = authDAO.getAuth(authToken);
             username = authData.username();
@@ -52,24 +53,37 @@ public class WebSocketHandler {
             return;
         }
 
+        //validate the gameID
+        int gameID = command.getGameID();
+        GameData gameData;
+        ChessGame game;
+        try {
+            gameData = gameDAO.getGame(gameID);
+            game = gameData.game();
+        } catch (DataAccessException e){
+            connections.add(gameID, username, session);
+            String anotherErrorMessage = String.format("There is no game %d", gameID);
+            badAuth(session, anotherErrorMessage);
+            return;
+        }
+
         MakeMoveCommand command1 = null;
         if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
             command1 = new Gson().fromJson(message, MakeMoveCommand.class);
         }
-        GameData gameData = gameDAO.getGame(command.getGameID());
-        ChessGame game = gameData.game();
+
         switch(command.getCommandType()){
-            case CONNECT -> connect(username, command.getGameID(), session, game);
+            case CONNECT -> connect(username, gameID, session, game);
             case MAKE_MOVE -> {
                 try{
-                    makeMove(username, command1.getGameID(), command1.getMove(), game);
+                    makeMove(username, gameID, command1.getMove(), game);
                 } catch (DataAccessException | InvalidMoveException e) {
                     throw new RuntimeException(e);
                 }
                 break;
             }
-            case LEAVE -> leaveGame(username, command.getGameID());
-            case RESIGN -> resign(username, command.getGameID(), game);
+            case LEAVE -> leaveGame(username, gameID);
+            case RESIGN -> resign(username, gameID, game);
         }
         System.out.print("End of onMessage function");
     }
@@ -86,7 +100,6 @@ public class WebSocketHandler {
         }
         if(username == null){
             String errorMessage = "Invalid user";
-
         }
         if (gameData != null){
             try {
