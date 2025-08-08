@@ -216,6 +216,11 @@ public class WebSocketHandler {
 
     public void resign(String username, int gameID, ChessGame game) throws IOException, DataAccessException {
         GameData gameData = gameDAO.getGame(gameID);
+        if(game.getIsOver()){
+            String alreadyDone = "Other player has already resigned";
+            sendError(username, gameID, alreadyDone);
+            return;
+        }
         game.setIsOverTrue();
         String message;
         if(gameData.whiteUsername().equals(username)){
@@ -225,6 +230,7 @@ public class WebSocketHandler {
         } else {
             message = "Not a player, cannot resign from game";
             sendError(username, gameID, message);
+            return;
         }
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(gameID, null, notificationMessage);
