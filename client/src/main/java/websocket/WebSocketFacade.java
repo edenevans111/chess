@@ -1,9 +1,12 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.sun.nio.sctp.NotificationHandler;
 import serverfacade.ResponseException;
 import ui.BoardDisplay;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -66,4 +69,35 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
+
+    public void leaveGame(String username, String authToken, int gameID){
+       try {
+           UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+           String json = new Gson().toJson(userGameCommand);
+           this.session.getBasicRemote().sendText(json);
+       } catch (Exception e) {
+           throw new RuntimeException("Unable to leave game");
+       }
+    }
+
+    public void makeMove(String username, String authToken, int gameID, ChessMove move){
+       try {
+           MakeMoveCommand makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+           String json = new Gson().toJson(makeMoveCommand);
+           this.session.getBasicRemote().sendText(json);
+       } catch (Exception e){
+           throw new RuntimeException("Unable to make the move");
+       }
+    }
+
+    public void joinGame(String username, String authToken, int gameID){
+       try{
+           UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+           String json = new Gson().toJson(userGameCommand);
+           this.session.getBasicRemote().sendText(json);
+       } catch (Exception e) {
+           throw new RuntimeException("unable to join the game");
+       }
+    }
+
 }

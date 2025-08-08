@@ -6,6 +6,9 @@ import request.*;
 import response.*;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
+import websocket.WebSocketFacade;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,9 +19,12 @@ public class ChessClient {
     private String serverUrl;
     private ServerFacade serverFacade;
     private boolean isLoggedIn = false;
-
-    // I need to ask about how to make the server.ServerFacade object
-    // I cannot figure out how to make it correctly for whatever reason
+    private boolean inGameplay = false;
+    private boolean isObserver = false;
+    private boolean displayWhite = true;
+    private GameData gameData = null;
+    private String authToken = null;
+    private String username = null;
 
     public ChessClient(String serverUrl){
         this.serverUrl = serverUrl;
@@ -49,16 +55,25 @@ public class ChessClient {
             helpString.append("Register: supply username, password, email to create an account\n");
             helpString.append("Login: username and password to login to account\n");
             helpString.append("Quit: exit the program\n");
-            helpString.append("Help: commands that can be given");
-        } else {
+            helpString.append("Help: commands that can be given\n");
+        } else if (!inGameplay && !isObserver){
             helpString.append("Logout\n");
             helpString.append("Create: supply name for a new chess game (name must be one word) \n");
             helpString.append("List: get a list of all the current games\n");
             helpString.append("Play: request to play a certain game using the game ID\n");
             helpString.append("Observe: indicate a game you would wish to watch\n");
-            helpString.append("Help: commands that can be given");
+            helpString.append("Help: commands that can be given\n");
+        } else if (inGameplay){
+            helpString.append("Redraw Chess Board: redraws the chess board\n");
+            helpString.append("Leave: leave the game without ending it\n");
+            helpString.append("Move: indicate the start position and the desired end position\n");
+            helpString.append("Resign: forfeit the game, the other player wins\n");
+            helpString.append("Highlight: highlights all the possible moves\n");
+            helpString.append("Help: list of all the possible actions\n");
+        } else {
+            helpString.append("Leave: leave the game\n");
+            helpString.append("Help: list of all the possible actions\n");
         }
-
         return helpString.toString();
     }
 
@@ -80,6 +95,8 @@ public class ChessClient {
                     LoginResponse response = serverFacade.login(request);
                     loginString.append("Congratulations, you are logged in as " + response.username());
                     isLoggedIn = true;
+                    this.authToken = response.authToken();
+                    this.username = response.username();
                 } catch (ResponseException e){
                     loginString.append("Invalid Login given");
                 }
@@ -111,6 +128,8 @@ public class ChessClient {
                     RegisterResponse response = serverFacade.register(request);
                     registerString.append("Welcome! You are now signed in as " + response.username());
                     isLoggedIn = true;
+                    this.authToken = response.authToken();
+                    this.username = response.username();
                 } catch (ResponseException e){
                     registerString.append("Unable to register");
                 }
@@ -183,13 +202,16 @@ public class ChessClient {
                 for (GameData gameData : games){
                     if(gameData.gameID() == gameID){
                         game = gameData.game();
+                        this.gameData = gameData;
                     }
                 }
                 BoardDisplay display = new ChessBoardPrinter();
                 if(teamColor == ChessGame.TeamColor.WHITE){
                     display.displayWhiteBoard(game);
+                    displayWhite = true;
                 } else{
                     display.displayBlackBoard(game);
+                    displayWhite = false;
                 }
             } catch (ResponseException e){
                 joinString.append("Unable to join game");
@@ -202,7 +224,6 @@ public class ChessClient {
 
     private String observeGame(String [] args) throws ResponseException {
         StringBuilder observeString = new StringBuilder();
-
         if(args.length != 1){
             observeString.append("Need to specify a game");
         } else {
@@ -224,6 +245,7 @@ public class ChessClient {
                     observeString.append("You are now joining game: " + gameID);
                     BoardDisplay boardDisplay = new ChessBoardPrinter();
                     boardDisplay.displayWhiteBoard(actualGame);
+                    isObserver = true;
                 } else {
                     observeString.append("Game was not found");
                 }
@@ -232,6 +254,32 @@ public class ChessClient {
             }
         }
         return observeString.toString();
+    }
+
+    // this is where all the gamePlayUI will go:
+
+    public String leave() throws ResponseException {
+        StringBuilder leaveMessage = new StringBuilder();
+        if(isObserver){
+            isObserver = false;
+            leaveMessage.append("You have left the game and are no longer observing");
+
+        } else {
+            leaveMessage.append("You are leaving the game as a player");
+        }
+        UserGameCommand leaveRequest = new UserGameCommand(UserGameCommand.CommandType.LEAVE,
+                authToken, gameData.gameID());
+
+        return leaveMessage.toString();
+    }
+
+    public void redrawChessBoard() {
+        BoardDisplay boardDisplay = new ChessBoardPrinter();
+        if(displayWhite){
+            boardDisplay.displayWhiteBoard(gameData.game());
+        } else {
+            boardDisplay.displayBlackBoard(gameData.game());
+        }
     }
 
 }
