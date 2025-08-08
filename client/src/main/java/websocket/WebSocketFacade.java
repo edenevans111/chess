@@ -22,7 +22,7 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
 
    private final Session session;
-   private BoardDisplay boardDisplay;
+   private final BoardDisplay boardDisplay;
    NotificationHandler notificationHandler;
 
    public WebSocketFacade(String url, BoardDisplay boardDisplay) throws ResponseException {
@@ -88,6 +88,7 @@ public class WebSocketFacade extends Endpoint {
        try {
            MakeMoveCommand makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
            String json = new Gson().toJson(makeMoveCommand);
+           // does this need to connect to the webSocketHandler?
            this.session.getBasicRemote().sendText(json);
        } catch (Exception e){
            throw new RuntimeException("Unable to make the move");

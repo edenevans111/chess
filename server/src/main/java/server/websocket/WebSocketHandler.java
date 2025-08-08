@@ -133,11 +133,13 @@ public class WebSocketHandler {
         GameData gameData = gameDAO.getGame(gameID);
         if(!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())){
             String message = "You are not authorized to make any moves";
+            System.out.print("this is where the error is");
             sendError(username, gameID, message);
             return;
         }
         if (game.getIsOver()){
             String message = String.format("%d is over, you cannot make any moves", gameID);
+            System.out.print("this is where the error is");
             sendError(username, gameID, message);
             return;
         }
@@ -158,7 +160,7 @@ public class WebSocketHandler {
         boolean isStalemate;
         boolean isCheck;
         boolean isCheckmate;
-        if(gameData.blackUsername().equals(username)){
+        if(gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
             displayWhite = false;
             isStalemate = game.isInStalemate(ChessGame.TeamColor.BLACK);
             isCheck = game.isInCheck(ChessGame.TeamColor.BLACK);

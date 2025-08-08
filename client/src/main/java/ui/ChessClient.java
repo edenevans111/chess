@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.GameData;
 import request.*;
 import response.*;
@@ -12,6 +14,7 @@ import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Scanner;
 
 public class ChessClient {
     // handles all the logic for the Repl parameters
@@ -50,6 +53,9 @@ public class ChessClient {
             case "list" -> listGames();
             case "join" -> joinGame(parameters);
             case "observe" -> observeGame(parameters);
+            case "leave" -> leave();
+            case "redraw" -> redrawChessBoard();
+            case "move" -> makeMove(parameters);
             default -> help();
         });
     }
@@ -67,7 +73,7 @@ public class ChessClient {
             helpString.append("Logout\n");
             helpString.append("Create: supply name for a new chess game (name must be one word) \n");
             helpString.append("List: get a list of all the current games\n");
-            helpString.append("Play: request to play a certain game using the game ID\n");
+            helpString.append("Join: request to play a certain game using the game ID\n");
             helpString.append("Observe: indicate a game you would wish to watch\n");
             helpString.append("Help: commands that can be given\n");
         } else if (inGameplay){
@@ -186,7 +192,10 @@ public class ChessClient {
 
     private String joinGame(String [] args) throws ResponseException {
         StringBuilder joinString = new StringBuilder();
-
+        if(inGameplay || isObserver){
+            joinString.append("You are already part of another game");
+            return joinString.toString();
+        }
         if(args.length < 2){
             joinString.append("Not enough information provided");
         } else {
@@ -226,13 +235,17 @@ public class ChessClient {
                 joinString.append("Need to give number");
             }
         }
+        wsf.joinGame(username, authToken, gameData.gameID());
+        inGameplay = true;
         return joinString.toString();
-
-        // In addition to all of this, I also need to make a boardDisplay with a message
     }
 
     private String observeGame(String [] args) throws ResponseException {
         StringBuilder observeString = new StringBuilder();
+        if(inGameplay || isObserver){
+            observeString.append("You are already part of another game");
+            return observeString.toString();
+        }
         if(args.length != 1){
             observeString.append("Need to specify a game");
         } else {
@@ -262,38 +275,96 @@ public class ChessClient {
                 observeString.append("need to give a number");
             }
         }
+        wsf.joinGame(username, authToken, gameData.gameID());
+        isObserver = true;
         return observeString.toString();
     }
 
     public String leave() throws ResponseException {
-        StringBuilder leaveMessage = new StringBuilder();
-        if(!isObserver || !inGameplay){
+        if(!isObserver && !inGameplay){
             throw new RuntimeException("You need to be in a game to leave");
         }
-
-        if(isObserver){
+        try {
+            wsf.leaveGame(username, authToken, gameData.gameID());
+            String response = String.format("Now leaving game %d", gameData.gameID());
             isObserver = false;
-            leaveMessage.append("You have left the game and are no longer observing");
-
-
-        } else {
-            leaveMessage.append("You are leaving the game as a player");
+            inGameplay = false;
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to leave game");
         }
-        UserGameCommand leaveRequest = new UserGameCommand(UserGameCommand.CommandType.LEAVE,
-                authToken, gameData.gameID());
-
-
-        return leaveMessage.toString();
     }
 
 
-    public void redrawChessBoard() {
+    public String redrawChessBoard() throws ResponseException {
         BoardDisplay boardDisplay = new ChessBoardPrinter();
+        if(!isLoggedIn){
+            throw new ResponseException("You need to be signed in to redraw board");
+        }
+        if (!inGameplay && !isObserver){
+            throw new ResponseException("You need to join a game to redraw chess board");
+        }
         if(displayWhite){
             boardDisplay.displayWhiteBoard(gameData.game());
         } else {
             boardDisplay.displayBlackBoard(gameData.game());
         }
+        return String.format("Redrew game %d", gameData.gameID());
+    }
+
+    public String makeMove(String [] args){
+        StringBuilder moveString = new StringBuilder();
+        if(!inGameplay){
+            moveString.append("You must be a player to make a move");
+            return moveString.toString();
+        }
+        if(args.length != 2){
+            moveString.append("Need a start and end position");
+            return moveString.toString();
+        }
+        try {
+            ChessPosition startPosition = stringToPosition(args[0].toString());
+            ChessPosition endPosition = stringToPosition(args[1].toString());
+            ChessMove move = new ChessMove(startPosition, endPosition);
+            moveString.append("Moving piece from " + args[0].toString() + " to " + args[1].toString());
+            wsf.makeMove(username, authToken, gameData.gameID(), move);
+        } catch (Exception e){
+            moveString.append("Invalid position given");
+        }
+        return moveString.toString();
+    }
+
+    private ChessPosition stringToPosition(String stringPosition) throws Exception {
+        char[] validLetter = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+        char first = Character.toLowerCase(stringPosition.charAt(0));
+        char second = Character.toLowerCase(stringPosition.charAt(1));
+        int row = Character.getNumericValue(second);
+        int counter = 0;
+        int column = 0;
+        for (char c : validLetter){
+            counter++;
+            if(c == first){
+                column = counter;
+            }
+        }
+        if(column == 0){
+            throw new Exception("column letter needs to be between a-h");
+        }
+        if (row > 8 || row < 1){
+            throw new Exception("row needs to be between 1-8");
+        }
+        return new ChessPosition(row, column);
+    }
+
+    public String resign(){
+        StringBuilder resignString = new StringBuilder();
+        System.out.print("Are you sure you want to resign? (yes or no): ");
+        Scanner scanner = new Scanner(System.in);
+        String answer = scanner.nextLine();
+        if(answer.equals("yes")){
+
+        }
+        return resignString.toString();
     }
 
 }
