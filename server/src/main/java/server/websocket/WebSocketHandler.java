@@ -193,6 +193,8 @@ public class WebSocketHandler {
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(gameID, username, notificationMessage1);
         }
+        GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+        gameDAO.updateGame(updatedGame);
     }
 
     public void leaveGame(String username, int gameID) throws IOException, DataAccessException {
