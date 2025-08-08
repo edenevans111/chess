@@ -50,12 +50,7 @@ public class WebSocketFacade extends Endpoint {
                            boardDisplay.displayMessage(errorMessage.toString());
                        }
                        case LOAD_GAME -> {
-                           LoadGameMessage loadGameMessage = new Gson().fromJson(s, LoadGameMessage.class);
-                           if(loadGameMessage.shouldDisplayWhite()){
-                               boardDisplay.displayWhiteBoard(loadGameMessage.getGame());
-                           } else {
-                               boardDisplay.displayBlackBoard(loadGameMessage.getGame());
-                           }
+                           handleLoadGame(s);
                        }
                    }
                }
@@ -64,6 +59,15 @@ public class WebSocketFacade extends Endpoint {
            throw new ResponseException(e.getMessage());
        }
 
+   }
+
+   private void handleLoadGame(String s){
+       LoadGameMessage loadGameMessage = new Gson().fromJson(s, LoadGameMessage.class);
+       if(loadGameMessage.shouldDisplayWhite()){
+           boardDisplay.displayWhiteBoard(loadGameMessage.getGame());
+       } else {
+           boardDisplay.displayBlackBoard(loadGameMessage.getGame());
+       }
    }
 
     @Override
