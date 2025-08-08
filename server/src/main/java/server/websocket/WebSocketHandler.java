@@ -141,17 +141,15 @@ public class WebSocketHandler {
             sendError(username, gameID, message);
             return;
         }
-        Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
-        boolean isValid = false;
-        for(ChessMove potentialMove : validMoves){
-            if (potentialMove.getEndPosition().equals(move.getEndPosition())) {
-                isValid = true;
-                break;
-            }
+        if(game.getTeamTurn() == ChessGame.TeamColor.WHITE && username.equals(gameData.blackUsername()) ||
+        game.getTeamTurn() == ChessGame.TeamColor.BLACK && username.equals(gameData.whiteUsername())){
+            String wrongPlayer = "It's not your turn";
+            sendError(username, gameID, wrongPlayer);
+            return;
         }
-        if(isValid){
+        try{
             game.makeMove(move);
-        }  else {
+        } catch (InvalidMoveException e) {
             String errorMessage = "Invalid move";
             sendError(username, gameID, errorMessage);
             return;
@@ -224,6 +222,8 @@ public class WebSocketHandler {
             return;
         }
         game.setIsOverTrue();
+        GameData updatedGame = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+        gameDAO.updateGame(updatedGame);
         String message;
         if(gameData.whiteUsername().equals(username)){
             message = String.format("%s has resigned. Black Player: %s wins", username, gameData.blackUsername());
