@@ -256,30 +256,4 @@ public class ChessClient {
         return observeString.toString();
     }
 
-    // this is where all the gamePlayUI will go:
-
-    public String leave() throws ResponseException {
-        StringBuilder leaveMessage = new StringBuilder();
-        if(isObserver){
-            isObserver = false;
-            leaveMessage.append("You have left the game and are no longer observing");
-
-        } else {
-            leaveMessage.append("You are leaving the game as a player");
-        }
-        UserGameCommand leaveRequest = new UserGameCommand(UserGameCommand.CommandType.LEAVE,
-                authToken, gameData.gameID());
-
-        return leaveMessage.toString();
-    }
-
-    public void redrawChessBoard() {
-        BoardDisplay boardDisplay = new ChessBoardPrinter();
-        if(displayWhite){
-            boardDisplay.displayWhiteBoard(gameData.game());
-        } else {
-            boardDisplay.displayBlackBoard(gameData.game());
-        }
-    }
-
 }
