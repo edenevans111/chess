@@ -131,7 +131,7 @@ public class WebSocketHandler {
 
     public void makeMove(String username, int gameID, ChessMove move, ChessGame game) throws IOException, DataAccessException, InvalidMoveException {
         GameData gameData = gameDAO.getGame(gameID);
-        if(!username.equals(gameData.whiteUsername()) || !username.equals(gameData.blackUsername())){
+        if(!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())){
             String message = "You are not authorized to make any moves";
             sendError(username, gameID, message);
             return;
@@ -160,7 +160,7 @@ public class WebSocketHandler {
         boolean isStalemate;
         boolean isCheck;
         boolean isCheckmate;
-        if(gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
+        if(gameData.blackUsername().equals(username)){
             displayWhite = false;
             isStalemate = game.isInStalemate(ChessGame.TeamColor.BLACK);
             isCheck = game.isInCheck(ChessGame.TeamColor.BLACK);
@@ -227,7 +227,7 @@ public class WebSocketHandler {
             sendError(username, gameID, message);
         }
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(gameID, username, notificationMessage);
+        connections.broadcast(gameID, null, notificationMessage);
     }
 
     public void sendError(String username, int gameID, String message){
