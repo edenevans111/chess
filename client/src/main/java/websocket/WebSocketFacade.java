@@ -45,11 +45,11 @@ public class WebSocketFacade extends Endpoint {
                    switch(messageType){
                        case NOTIFICATION -> {
                            NotificationMessage notificationMessage = new Gson().fromJson(s, NotificationMessage.class);
-                           boardDisplay.displayMessage(notificationMessage.toString());
+                           boardDisplay.displayMessage(notificationMessage.getNotification());
                        }
                        case ERROR -> {
                            ErrorMessage errorMessage = new Gson().fromJson(s, ErrorMessage.class);
-                           boardDisplay.displayMessage(errorMessage.toString());
+                           boardDisplay.displayMessage(errorMessage.getErrorMessage());
                        }
                        case LOAD_GAME -> {
                            handleLoadGame(s);
