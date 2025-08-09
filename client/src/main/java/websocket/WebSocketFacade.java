@@ -64,9 +64,9 @@ public class WebSocketFacade extends Endpoint {
    private void handleLoadGame(String s){
        LoadGameMessage loadGameMessage = new Gson().fromJson(s, LoadGameMessage.class);
        if(loadGameMessage.shouldDisplayWhite()){
-           boardDisplay.displayWhiteBoard(loadGameMessage.getGame());
+           boardDisplay.displayWhiteBoard(loadGameMessage.getGame(), null);
        } else {
-           boardDisplay.displayBlackBoard(loadGameMessage.getGame());
+           boardDisplay.displayBlackBoard(loadGameMessage.getGame(), null);
        }
    }
 
@@ -102,6 +102,16 @@ public class WebSocketFacade extends Endpoint {
            this.session.getBasicRemote().sendText(json);
        } catch (Exception e) {
            throw new RuntimeException("unable to join the game");
+       }
+    }
+
+    public void resign(String username, String authToken, int gameID){
+       try{
+           UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+           String json = new Gson().toJson(userGameCommand);
+           this.session.getBasicRemote().sendText(json);
+       } catch (Exception e) {
+           throw new RuntimeException("Unable to resign from game");
        }
     }
 

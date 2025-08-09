@@ -17,7 +17,7 @@ public class ChessBoardPrinter implements BoardDisplay{
     }
 
     @Override
-    public void displayBlackBoard(ChessGame game) {
+    public void displayBlackBoard(ChessGame game, HashSet<ChessPosition> validSquares) {
         System.out.println("\n" + SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "    h " +
                 " g " + " f " + " e " + " d " + " c " + " b " + " a " + "   " + RESET_BG_COLOR);
         for (int i = 1; i < 9; i++) {
@@ -32,7 +32,7 @@ public class ChessBoardPrinter implements BoardDisplay{
     }
 
     @Override
-    public void displayWhiteBoard(ChessGame game) {
+    public void displayWhiteBoard(ChessGame game, HashSet<ChessPosition> validSquares) {
 
         System.out.println("\n" + SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "    a " +
                 " b " + " c " + " d " + " e " + " f " + " g " + " h " + "   " + RESET_BG_COLOR);

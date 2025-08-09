@@ -14,6 +14,7 @@ import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class ChessClient {
@@ -56,6 +57,7 @@ public class ChessClient {
             case "leave" -> leave();
             case "redraw" -> redrawChessBoard();
             case "move" -> makeMove(parameters);
+            case "resign" -> resign();
             default -> help();
         });
     }
@@ -209,7 +211,6 @@ public class ChessClient {
                 int gameID = Integer.parseInt(args[1]);
                 JoinRequest request = new JoinRequest(teamColor, gameID);
                 JoinResponse response = serverFacade.join(request);
-                joinString.append("Now joining game " + gameID);
 
                 ChessGame game = null;
                 ListRequest listRequest = new ListRequest();
@@ -221,12 +222,17 @@ public class ChessClient {
                         this.gameData = gameData;
                     }
                 }
+                if(game.getIsOver()){
+                    joinString.append("This game is over, you cannot join");
+                    return joinString.toString();
+                }
+                joinString.append("Now joining game " + gameID);
                 BoardDisplay display = new ChessBoardPrinter();
                 if(teamColor == ChessGame.TeamColor.WHITE){
-                    display.displayWhiteBoard(game);
+                    display.displayWhiteBoard(game, null);
                     displayWhite = true;
                 } else{
-                    display.displayBlackBoard(game);
+                    display.displayBlackBoard(game, null);
                     displayWhite = false;
                 }
             } catch (ResponseException e){
@@ -266,7 +272,7 @@ public class ChessClient {
                 if(hasGame){
                     observeString.append("You are now joining game: " + gameID);
                     BoardDisplay boardDisplay = new ChessBoardPrinter();
-                    boardDisplay.displayWhiteBoard(actualGame);
+                    boardDisplay.displayWhiteBoard(actualGame, null);
                     isObserver = true;
                 } else {
                     observeString.append("Game was not found");
@@ -305,9 +311,9 @@ public class ChessClient {
             throw new ResponseException("You need to join a game to redraw chess board");
         }
         if(displayWhite){
-            boardDisplay.displayWhiteBoard(gameData.game());
+            boardDisplay.displayWhiteBoard(gameData.game(), null);
         } else {
-            boardDisplay.displayBlackBoard(gameData.game());
+            boardDisplay.displayBlackBoard(gameData.game(), null);
         }
         return String.format("Redrew game %d", gameData.gameID());
     }
@@ -362,9 +368,49 @@ public class ChessClient {
         Scanner scanner = new Scanner(System.in);
         String answer = scanner.nextLine();
         if(answer.equals("yes")){
-
+            try {
+                wsf.resign(username, authToken, gameData.gameID());
+                resignString.append("You have resigned from the game");
+                inGameplay = false;
+            } catch (Exception e) {
+                resignString.append("Unable to resign from the game");
+            }
+        } else {
+            return " ";
         }
         return resignString.toString();
+    }
+
+    public String highlight(String [] args){
+        StringBuilder highlightString = new StringBuilder();
+        if(!isLoggedIn){
+            highlightString.append("You must be logged in to highlight game moves");
+            return highlightString.toString();
+        }
+        if(!isObserver || !inGameplay){
+            highlightString.append("You must be playing or observing to highlight game moves");
+            return highlightString.toString();
+        }
+        if(args.length != 1){
+            highlightString.append("You must indicate one piece that you would like to observe");
+            return highlightString.toString();
+        }
+        try{
+            ChessPosition position = stringToPosition(args[0]);
+            ChessGame game = gameData.game();
+            Collection<ChessMove> validMoves = game.validMoves(position);
+            HashSet<ChessPosition> validSquares = new HashSet<>();
+            for (ChessMove move : validMoves){
+                validSquares.add(move.getEndPosition());
+            }
+
+        } catch (Exception e){
+            highlightString.append("Not a valid move - try again");
+            return highlightString.toString();
+        }
+
+
+        return highlightString.toString();
     }
 
 }

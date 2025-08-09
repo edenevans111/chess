@@ -231,6 +231,7 @@ public class WebSocketHandler {
             message = String.format("%s has resigned. Black Player: %s wins", username, gameData.blackUsername());
         } else if (gameData.blackUsername().equals(username)){
             message = String.format("%s has resigned. Black Player: %s wins", username, gameData.whiteUsername());
+
         } else {
             message = "Not a player, cannot resign from game";
             sendError(username, gameID, message);
