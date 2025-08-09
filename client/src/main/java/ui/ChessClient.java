@@ -347,7 +347,6 @@ public class ChessClient {
             ChessMove move = new ChessMove(startPosition, endPosition);
             moveString.append("Moving piece from " + args[0].toString() + " to " + args[1].toString());
             wsf.makeMove(username, authToken, gameData.gameID(), move);
-            // I think I need to somehow have the this.gameData update here...
         } catch (Exception e){
             moveString.append("Invalid position given");
         }
@@ -386,6 +385,7 @@ public class ChessClient {
                 wsf.resign(username, authToken, gameData.gameID());
                 resignString.append("You have resigned from the game");
                 inGameplay = false;
+                // need to find a way to get rid of the game...
             } catch (Exception e) {
                 resignString.append("Unable to resign from the game");
             }
