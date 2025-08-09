@@ -1,6 +1,7 @@
 package websocket;
 
 import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.sun.nio.sctp.NotificationHandler;
 import serverfacade.ResponseException;
@@ -18,6 +19,7 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 
 public class WebSocketFacade extends Endpoint {
 
@@ -64,9 +66,9 @@ public class WebSocketFacade extends Endpoint {
    private void handleLoadGame(String s){
        LoadGameMessage loadGameMessage = new Gson().fromJson(s, LoadGameMessage.class);
        if(loadGameMessage.shouldDisplayWhite()){
-           boardDisplay.displayWhiteBoard(loadGameMessage.getGame(), null);
+           boardDisplay.displayWhiteBoard(loadGameMessage.getGame(), new HashSet<ChessPosition>());
        } else {
-           boardDisplay.displayBlackBoard(loadGameMessage.getGame(), null);
+           boardDisplay.displayBlackBoard(loadGameMessage.getGame(), new HashSet<ChessPosition>());
        }
    }
 

@@ -58,6 +58,7 @@ public class ChessClient {
             case "redraw" -> redrawChessBoard();
             case "move" -> makeMove(parameters);
             case "resign" -> resign();
+            case "highlight" -> highlight(parameters);
             default -> help();
         });
     }
@@ -229,10 +230,8 @@ public class ChessClient {
                 joinString.append("Now joining game " + gameID);
                 BoardDisplay display = new ChessBoardPrinter();
                 if(teamColor == ChessGame.TeamColor.WHITE){
-                    display.displayWhiteBoard(game, null);
                     displayWhite = true;
                 } else{
-                    display.displayBlackBoard(game, null);
                     displayWhite = false;
                 }
             } catch (ResponseException e){
@@ -272,7 +271,7 @@ public class ChessClient {
                 if(hasGame){
                     observeString.append("You are now joining game: " + gameID);
                     BoardDisplay boardDisplay = new ChessBoardPrinter();
-                    boardDisplay.displayWhiteBoard(actualGame, null);
+                    boardDisplay.displayWhiteBoard(actualGame, new HashSet<ChessPosition>());
                     isObserver = true;
                 } else {
                     observeString.append("Game was not found");
@@ -311,9 +310,9 @@ public class ChessClient {
             throw new ResponseException("You need to join a game to redraw chess board");
         }
         if(displayWhite){
-            boardDisplay.displayWhiteBoard(gameData.game(), null);
+            boardDisplay.displayWhiteBoard(gameData.game(), new HashSet<ChessPosition>());
         } else {
-            boardDisplay.displayBlackBoard(gameData.game(), null);
+            boardDisplay.displayBlackBoard(gameData.game(), new HashSet<ChessPosition>());
         }
         return String.format("Redrew game %d", gameData.gameID());
     }
@@ -387,7 +386,7 @@ public class ChessClient {
             highlightString.append("You must be logged in to highlight game moves");
             return highlightString.toString();
         }
-        if(!isObserver || !inGameplay){
+        if(!isObserver && !inGameplay){
             highlightString.append("You must be playing or observing to highlight game moves");
             return highlightString.toString();
         }
@@ -403,13 +402,16 @@ public class ChessClient {
             for (ChessMove move : validMoves){
                 validSquares.add(move.getEndPosition());
             }
-
+            BoardDisplay boardDisplay = new ChessBoardPrinter();
+            if(displayWhite){
+                boardDisplay.displayWhiteBoard(game,validSquares);
+            } else {
+                boardDisplay.displayBlackBoard(game, validSquares);
+            }
         } catch (Exception e){
             highlightString.append("Not a valid move - try again");
             return highlightString.toString();
         }
-
-
         return highlightString.toString();
     }
 

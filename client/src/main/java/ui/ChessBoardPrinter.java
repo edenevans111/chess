@@ -25,7 +25,7 @@ public class ChessBoardPrinter implements BoardDisplay{
             row.append(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + " " + i + " ");
             System.out.print(row);
             boolean startWhite = i % 2 == 1;
-            printRow(startWhite, i, game, true);
+            printRow(startWhite, i, game, true, validSquares);
         }
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "    h " +
                 " g " + " f " + " e " + " d " + " c " + " b " + " a " + "   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
@@ -41,19 +41,19 @@ public class ChessBoardPrinter implements BoardDisplay{
             row.append(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + " " + i + " ");
             System.out.print(row);
             boolean startWhite = i % 2 == 0;
-            printRow(startWhite, i, game, false);
+            printRow(startWhite, i, game, false, validSquares);
         }
         System.out.println(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + "    a " +
                 " b " + " c " + " d " + " e " + " f " + " g " + " h " + "   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
 
-    private void printRow(boolean startWhite, int rowNum, ChessGame game, boolean reverseColumns){
-        //System.out.print(bunchOfSpaces);
+    private void printRow(boolean startWhite, int rowNum, ChessGame game, boolean reverseColumns, HashSet<ChessPosition> validSquares){
         for (int i = 1; i < 9; i++) {
             int col = reverseColumns ? 9 - i : i;
             boolean isWhite = (i % 2 == 0) != startWhite;
             ChessPosition position = new ChessPosition(rowNum, col);
-            printSquare(isWhite, false, game.getBoard().getPiece(position));
+            boolean isHighlighted = validSquares.contains(position);
+            printSquare(isWhite, isHighlighted, game.getBoard().getPiece(position));
         }
         System.out.print(SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + " " + rowNum + " ");
         System.out.print(RESET_BG_COLOR + "\n");
