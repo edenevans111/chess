@@ -90,7 +90,6 @@ public class WebSocketFacade extends Endpoint {
        try {
            MakeMoveCommand makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
            String json = new Gson().toJson(makeMoveCommand);
-           // does this need to connect to the webSocketHandler?
            this.session.getBasicRemote().sendText(json);
        } catch (Exception e){
            throw new RuntimeException("Unable to make the move");

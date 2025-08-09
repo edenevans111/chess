@@ -312,10 +312,21 @@ public class ChessClient {
             redrawString.append("You need to join a game to redraw chess board");
             return redrawString.toString();
         }
+        ListRequest listRequest = new ListRequest();
+        ListResponse listResponse = serverFacade.listGames(listRequest);
+        Collection<GameData> games = listResponse.games();
+        ChessGame actualGame = null;
+        for(GameData gameData : games){
+            if (gameData.gameID() == this.gameData.gameID()){
+                actualGame = gameData.game();
+                break;
+            }
+        }
+
         if(displayWhite){
-            boardDisplay.displayWhiteBoard(this.gameData.game(), new HashSet<ChessPosition>());
+            boardDisplay.displayWhiteBoard(actualGame, new HashSet<ChessPosition>());
         } else {
-            boardDisplay.displayBlackBoard(this.gameData.game(), new HashSet<ChessPosition>());
+            boardDisplay.displayBlackBoard(actualGame, new HashSet<ChessPosition>());
         }
         return String.format("Redrew game %d", this.gameData.gameID());
     }
@@ -336,6 +347,7 @@ public class ChessClient {
             ChessMove move = new ChessMove(startPosition, endPosition);
             moveString.append("Moving piece from " + args[0].toString() + " to " + args[1].toString());
             wsf.makeMove(username, authToken, gameData.gameID(), move);
+            // I think I need to somehow have the this.gameData update here...
         } catch (Exception e){
             moveString.append("Invalid position given");
         }
