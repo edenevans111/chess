@@ -303,11 +303,14 @@ public class ChessClient {
 
     public String redrawChessBoard() throws ResponseException {
         BoardDisplay boardDisplay = new ChessBoardPrinter();
+        StringBuilder redrawString = new StringBuilder();
         if(!isLoggedIn){
-            throw new ResponseException("You need to be signed in to redraw board");
+            redrawString.append("You need to be signed in to redraw board");
+            return redrawString.toString();
         }
         if (!inGameplay && !isObserver){
-            throw new ResponseException("You need to join a game to redraw chess board");
+            redrawString.append("You need to join a game to redraw chess board");
+            return redrawString.toString();
         }
         if(displayWhite){
             boardDisplay.displayWhiteBoard(this.gameData.game(), new HashSet<ChessPosition>());
