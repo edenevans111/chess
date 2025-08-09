@@ -188,7 +188,7 @@ public class ChessClient {
         ListResponse response = serverFacade.listGames(request);
         for(GameData game : response.games()){
             listString.append(game.gameID() + " : " + game.gameName() + "White Player: "
-                    + game.whiteUsername() + "Black Player: " + game.blackUsername() + "\n");
+                    + game.whiteUsername() + " Black Player: " + game.blackUsername() + "\n");
         }
         return listString.toString();
     }
@@ -310,11 +310,11 @@ public class ChessClient {
             throw new ResponseException("You need to join a game to redraw chess board");
         }
         if(displayWhite){
-            boardDisplay.displayWhiteBoard(gameData.game(), new HashSet<ChessPosition>());
+            boardDisplay.displayWhiteBoard(this.gameData.game(), new HashSet<ChessPosition>());
         } else {
-            boardDisplay.displayBlackBoard(gameData.game(), new HashSet<ChessPosition>());
+            boardDisplay.displayBlackBoard(this.gameData.game(), new HashSet<ChessPosition>());
         }
-        return String.format("Redrew game %d", gameData.gameID());
+        return String.format("Redrew game %d", this.gameData.gameID());
     }
 
     public String makeMove(String [] args){
