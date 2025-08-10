@@ -3,7 +3,6 @@ package websocket;
 import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
-import com.sun.nio.sctp.NotificationHandler;
 import serverfacade.ResponseException;
 import ui.BoardDisplay;
 import websocket.commands.MakeMoveCommand;
@@ -27,8 +26,9 @@ public class WebSocketFacade extends Endpoint {
    private final BoardDisplay boardDisplay;
    NotificationHandler notificationHandler;
 
-   public WebSocketFacade(String url, BoardDisplay boardDisplay) throws ResponseException {
+   public WebSocketFacade(String url, BoardDisplay boardDisplay, NotificationHandler notificationHandler) throws ResponseException {
        try{
+           this.notificationHandler = notificationHandler;
            url = url.replace("http", "ws");
            URI socketURI = new URI(url + "/ws");
            this.boardDisplay = boardDisplay;
@@ -65,11 +65,7 @@ public class WebSocketFacade extends Endpoint {
 
    private void handleLoadGame(String s){
        LoadGameMessage loadGameMessage = new Gson().fromJson(s, LoadGameMessage.class);
-       if(loadGameMessage.shouldDisplayWhite()){
-           boardDisplay.displayWhiteBoard(loadGameMessage.getGame(), new HashSet<ChessPosition>());
-       } else {
-           boardDisplay.displayBlackBoard(loadGameMessage.getGame(), new HashSet<ChessPosition>());
-       }
+       notificationHandler.loadGameHandler(loadGameMessage.getGame());
    }
 
     @Override
@@ -97,6 +93,7 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void joinGame(String username, String authToken, int gameID){
+       StringBuilder joinString = new StringBuilder();
        try{
            UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
            String json = new Gson().toJson(userGameCommand);

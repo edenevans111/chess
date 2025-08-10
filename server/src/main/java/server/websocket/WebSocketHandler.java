@@ -121,7 +121,7 @@ public class WebSocketHandler {
                 NotificationMessage notificationMessage =
                         new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(gameID, username, notificationMessage);
-                LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, displayWhite);
+                LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
                 connections.singleMessage(gameID, username, loadGameMessage);
             } catch (Exception e){
                 sendError(username, gameID, e.getMessage());
@@ -171,7 +171,7 @@ public class WebSocketHandler {
             isCheckmate = game.isInCheckmate(ChessGame.TeamColor.WHITE);
         }
         LoadGameMessage loadGameMessage =
-                new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, displayWhite);
+                new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
         connections.broadcast(gameID, null, loadGameMessage);
         String notification = String.format("%s moved from %s to %s", username, move.getStartPosition(), move.getEndPosition());
         NotificationMessage notificationMessage =

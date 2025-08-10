@@ -8,6 +8,7 @@ import request.*;
 import response.*;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
+import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -17,7 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Scanner;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler {
     // handles all the logic for the Repl parameters
     // validation of the input
     private String serverUrl;
@@ -36,7 +37,7 @@ public class ChessClient {
         this.serverFacade = new ServerFacade(serverUrl);
         BoardDisplay boardDisplay = new ChessBoardPrinter();
         try {
-            this.wsf = new WebSocketFacade(serverUrl, boardDisplay);
+            this.wsf = new WebSocketFacade(serverUrl, boardDisplay, this);
         } catch (ResponseException e) {
             throw new RuntimeException("Unable to make the WebSocketFacade");
         }
@@ -253,9 +254,11 @@ public class ChessClient {
         }
         if(args.length != 1){
             observeString.append("Need to specify a game");
+
         } else {
+            int gameID = 0;
             try{
-                int gameID = Integer.parseInt(args[0]);
+                gameID = Integer.parseInt(args[0]);
                 ListRequest listRequest = new ListRequest();
                 ListResponse listResponse = serverFacade.listGames(listRequest);
                 Collection<GameData> games = listResponse.games();
@@ -279,25 +282,28 @@ public class ChessClient {
             } catch (NumberFormatException e){
                 observeString.append("need to give a number");
             }
+            wsf.joinGame(username, authToken, gameID);
+            isObserver = true;
         }
-        wsf.joinGame(username, authToken, gameData.gameID());
-        isObserver = true;
         return observeString.toString();
     }
 
-    public String leave() throws ResponseException {
+    public String leave(){
+        StringBuilder leaveString = new StringBuilder();
         if(!isObserver && !inGameplay){
-            throw new RuntimeException("You need to be in a game to leave");
+            leaveString.append("You need to be in a game to leave");
+            return leaveString.toString();
         }
         try {
             wsf.leaveGame(username, authToken, gameData.gameID());
             String response = String.format("Now leaving game %d", gameData.gameID());
             isObserver = false;
             inGameplay = false;
-            return response;
+            leaveString.append(response);
         } catch (Exception e) {
-            throw new RuntimeException("Unable to leave game");
+            leaveString.append("Unable to leave game");
         }
+        return leaveString.toString();
     }
 
 
@@ -411,17 +417,26 @@ public class ChessClient {
         }
         try{
             ChessPosition position = stringToPosition(args[0]);
-            ChessGame game = gameData.game();
-            Collection<ChessMove> validMoves = game.validMoves(position);
+            ListRequest listRequest = new ListRequest();
+            ListResponse listResponse = serverFacade.listGames(listRequest);
+            Collection<GameData> games = listResponse.games();
+            ChessGame actualGame = null;
+            for(GameData gameData : games){
+                if (gameData.gameID() == this.gameData.gameID()){
+                    actualGame = gameData.game();
+                    break;
+                }
+            }
+            Collection<ChessMove> validMoves = actualGame.validMoves(position);
             HashSet<ChessPosition> validSquares = new HashSet<>();
             for (ChessMove move : validMoves){
                 validSquares.add(move.getEndPosition());
             }
             BoardDisplay boardDisplay = new ChessBoardPrinter();
             if(displayWhite){
-                boardDisplay.displayWhiteBoard(game,validSquares);
+                boardDisplay.displayWhiteBoard(actualGame,validSquares);
             } else {
-                boardDisplay.displayBlackBoard(game, validSquares);
+                boardDisplay.displayBlackBoard(actualGame, validSquares);
             }
         } catch (Exception e){
             highlightString.append("Not a valid move - try again");
@@ -430,4 +445,13 @@ public class ChessClient {
         return highlightString.toString();
     }
 
+    @Override
+    public void loadGameHandler(ChessGame game) {
+        BoardDisplay boardDisplay = new ChessBoardPrinter();
+        if(displayWhite){
+            boardDisplay.displayWhiteBoard(game, new HashSet<>());
+        } else {
+            boardDisplay.displayBlackBoard(game, new HashSet<>());
+        }
+    }
 }
